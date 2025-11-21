@@ -130,5 +130,7 @@ inputField.addEventListener("keypress", (e) => {
 window.onload = () => {
   chatBox.scrollTop = chatBox.scrollHeight;
 };
+window.sendToNani = sendToNani;
+
 
 
