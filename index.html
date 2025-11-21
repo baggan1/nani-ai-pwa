@@ -63,8 +63,10 @@
     <div id="nani-loader" style="display:none;">Loading...</div>
   </div>
 
-  <!-- Supabase must load BEFORE app.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
+     <!-- Load Supabase FIRST → synchronous -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load app.js AFTER HTML & Supabase -->
+    <script defer src="app.js"></script>
 </body>
 </html>
+
