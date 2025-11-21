@@ -41,17 +41,6 @@ function appendMessage(sender, text) {
 }
 
 // ----------------------------
-// UTIL: Analytics Logging
-// ----------------------------
-async function logToSupabase(payload) {
-  try {
-    await sb.from("analytics_logs").insert(payload);
-  } catch (err) {
-    console.error("❌ Supabase analytics failed:", err);
-  }
-}
-
-// ----------------------------
 // MAIN: Send Query to API
 // ----------------------------
 async function sendToNani() {
@@ -98,18 +87,6 @@ async function sendToNani() {
     let rag_used = data.rag_used || false;
     let llm_used = data.llm_used || false;
 
-    // Send analytics to Supabase
-    await logToSupabase({
-      query: query,
-      match_count: data.match_count || 0,
-      max_similarity: data.max_similarity || 0,
-      sources: data.sources || [],
-      rag_used: rag_used,
-      llm_used: llm_used,
-      mode: mode,
-      latency_ms: latency
-    });
-
   } catch (err) {
     loader.style.display = "none";
     appendMessage("nani", "⚠️ Network error. Please try again.");
@@ -131,6 +108,7 @@ window.onload = () => {
   chatBox.scrollTop = chatBox.scrollHeight;
 };
 window.sendToNani = sendToNani;
+
 
 
 
