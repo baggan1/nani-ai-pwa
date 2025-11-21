@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nani-AI Wellness Assistant</title>
+
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#14A1A1">
+
+  <link rel="icon" href="/icons/icon-192.png">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+      background: #f0fdfa;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 15px;
+    }
+    h2 {
+      color: #0d8f8f;
+      text-align: center;
+    }
+    #chat-box {
+      height: 400px;
+      overflow-y: auto;
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d2d2d2;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background: #14A1A1;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>🌿 Nani-AI Wellness Assistant</h2>
+
+    <div id="chat-box"></div>
+
+    <input id="user-input" placeholder="What are you suffering from...">
+    <button onclick="sendQuery()">Ask Nani</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
