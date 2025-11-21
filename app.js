@@ -69,7 +69,7 @@ async function sendToNani() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": "YOUR_API_KEY"
+        "X-API-KEY": "gR4k#82GJ!nani2025"
       },
       body: JSON.stringify({
         query: query,
@@ -130,4 +130,5 @@ inputField.addEventListener("keypress", (e) => {
 window.onload = () => {
   chatBox.scrollTop = chatBox.scrollHeight;
 };
+
 
