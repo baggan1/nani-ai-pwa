@@ -10,7 +10,7 @@
 // ----------------------------
 // Supabase Client
 // ----------------------------
-const supabase = supabase.createClient(
+const sb = supabase.createClient(
   "https://biblbpmlpchztyifoypt.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpYmxicG1scGNoenR5aWZveXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODUxMjksImV4cCI6MjA3OTE2MTEyOX0.qmwrUIvkhjp7jB2Tb9E5ORQZPHVLyirjmhPe3tr9Lbk"
 );
@@ -45,7 +45,7 @@ function appendMessage(sender, text) {
 // ----------------------------
 async function logToSupabase(payload) {
   try {
-    await supabase.from("analytics_logs").insert(payload);
+    await sb.from("analytics_logs").insert(payload);
   } catch (err) {
     console.error("❌ Supabase analytics failed:", err);
   }
@@ -131,6 +131,7 @@ window.onload = () => {
   chatBox.scrollTop = chatBox.scrollHeight;
 };
 window.sendToNani = sendToNani;
+
 
 
 
