@@ -112,7 +112,44 @@ window.sendToNani = sendToNani;
 // ----------------------------------------
 // AUTO SEASONAL THEME (No UI control)
 // ----------------------------------------
+// If the user prefers dark mode, DO NOT apply seasonal theme
+if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.body.style.background = "#0f172a"; // dark slate
+    const style = document.createElement("style");
+    style.innerHTML = `
+      .msg-user .bubble { background: #1e293b; color: #f1f5f9; }
+      .msg-nani .bubble { background: #334155; color: #f8fafc; }
+    `;
+    document.head.appendChild(style);
+    return; // stop here — seasonal theming skipped
+}
+
 function applySeasonalTheme() {
+  
+  // --------------------------------------
+  // 1. DARK MODE → Override everything
+  // --------------------------------------
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.body.style.background = "#0f172a";  // dark background
+
+    const style = document.createElement("style");
+    style.innerHTML = `
+      .msg-user .bubble {
+        background: #1e293b;
+        color: #f1f5f9;
+      }
+      .msg-nani .bubble {
+        background: #334155;
+        color: #f8fafc;
+      }
+    `;
+    document.head.appendChild(style);
+    return;   // stop → no seasonal theme applied in dark mode
+  }
+
+  // --------------------------------------
+  // 2. LIGHT MODE → Apply automatic seasonal theme
+  // --------------------------------------
   const month = new Date().getMonth();
 
   let theme = {
@@ -122,31 +159,29 @@ function applySeasonalTheme() {
   };
 
   if (month === 11 || month <= 1) {
-    // WINTER — Vata
+    // WINTER (Vata)
     theme.bg = "#f0f7ff";
     theme.bubbleNani = "#e6f3ff";
     theme.bubbleUser = "#dcecff";
   } else if (month >= 2 && month <= 4) {
-    // SPRING — Kapha
+    // SPRING (Kapha)
     theme.bg = "#f0fdf4";
     theme.bubbleNani = "#d4f7d4";
     theme.bubbleUser = "#d9fbd9";
   } else if (month >= 5 && month <= 7) {
-    // SUMMER — Pitta
+    // SUMMER (Pitta)
     theme.bg = "#fffbea";
     theme.bubbleNani = "#fff3c4";
     theme.bubbleUser = "#ffe89c";
   } else if (month >= 8 && month <= 10) {
-    // FALL — Vata/Pitta balance
+    // FALL (Vata-Pitta)
     theme.bg = "#fef6e4";
     theme.bubbleNani = "#fde7c8";
     theme.bubbleUser = "#f7d8ae";
   }
 
-  // Apply main background
   document.body.style.background = theme.bg;
 
-  // Inject chat bubble colors
   const style = document.createElement("style");
   style.innerHTML = `
     .msg-user .bubble { background: ${theme.bubbleUser}; }
@@ -156,8 +191,3 @@ function applySeasonalTheme() {
 }
 
 applySeasonalTheme();
-
-
-
-
-
