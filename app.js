@@ -109,6 +109,48 @@ window.onload = () => {
 };
 window.sendToNani = sendToNani;
 
+/*******************************
+ * SEASONAL AYURVEDIC THEMES
+ *******************************/
+function applyTheme(theme) {
+  const root = document.documentElement;
+
+  if (theme === "vata") {
+    root.style.setProperty("--bg", "#F8F3EF");
+    root.style.setProperty("--bubble-nani", "#EFE7DD");
+    root.style.setProperty("--bubble-user", "#7A9D96");
+    root.style.setProperty("--text", "#4A453F");
+  }
+  else if (theme === "pitta") {
+    root.style.setProperty("--bg", "#E8FAF8");
+    root.style.setProperty("--bubble-nani", "#DFF7F3");
+    root.style.setProperty("--bubble-user", "#0C9A9A");
+    root.style.setProperty("--text", "#1B3A3A");
+  }
+  else if (theme === "kapha") {
+    root.style.setProperty("--bg", "#FBF8E8");
+    root.style.setProperty("--bubble-nani", "#F3EED2");
+    root.style.setProperty("--bubble-user", "#C49A2E");
+    root.style.setProperty("--text", "#4A453F");
+  }
+  else {
+    // AUTO — detect by month
+    const month = new Date().getMonth();
+
+    if ([11,0,1].includes(month)) applyTheme("vata");
+    else if ([5,6,7,8].includes(month)) applyTheme("pitta");
+    else applyTheme("kapha");
+  }
+}
+
+// Initial apply
+applyTheme("auto");
+
+// Change theme on dropdown change
+document.getElementById("theme-selector").addEventListener("change", (e) => {
+  applyTheme(e.target.value);
+});
+
 
 
 
