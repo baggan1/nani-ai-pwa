@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nani-AI Wellness Assistant</title>
 
-<title>Nani-AI • Wellness Guide</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0C9A9A">
 <link rel="icon" href="/icons/icon-192.png">
@@ -13,23 +13,59 @@
   body {
     margin: 0;
     padding: 0;
-    background: #F0F9F8;
     font-family: "Inter", system-ui, sans-serif;
-    color: #4A453F;
+    background: var(--bg, #F0F9F8);
+    color: var(--text, #4A453F);
+    transition: background 0.4s ease;
   }
 
+  /* ------ THEME VARIABLES ----- */
+  :root {
+    --bg: #F0F9F8;
+    --bubble-nani: #E8F4F3;
+    --bubble-user: #0C9A9A;
+    --text: #4A453F;
+    --header-bg: #FFFFFF;
+  }
+
+  /* ------ HEADER WITH AVATAR ----- */
+  .header {
+    text-align: center;
+    padding: 25px 20px 15px;
+    background: var(--header-bg);
+    border-bottom: 1px solid #D8E7E5;
+  }
+
+  .avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    margin: auto;
+    background: #fff;
+    border: 3px solid #C5E5E1;
+    background-image: url('/icons/nani-avatar.png'); /* <-- Add your avatar file */
+    background-size: cover;
+    background-position: center;
+  }
+
+  .title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 12px;
+    color: var(--text);
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-top: 3px;
+  }
+
+  /* ------ CONTAINER ------ */
   .container {
     max-width: 520px;
     margin: auto;
     padding: 20px;
-  }
-
-  h2 {
-    text-align: center;
-    color: #0C9A9A;
-    font-size: 1.9rem;
-    margin-bottom: 15px;
-    font-weight: 700;
   }
 
   #nani-chat-box {
@@ -39,47 +75,40 @@
     border-radius: 14px;
     padding: 15px;
     border: 1px solid #CCE7E5;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    box-shadow: 0 3px 9px rgba(0,0,0,0.05);
   }
 
-  /* Chat bubbles */
   .msg-user, .msg-nani {
     margin-bottom: 14px;
     display: flex;
     animation: fadeIn 0.3s ease;
   }
 
-  .msg-user {
-    justify-content: flex-end;
-  }
-
-  .msg-nani {
-    justify-content: flex-start;
-  }
+  .msg-user { justify-content: flex-end; }
+  .msg-nani { justify-content: flex-start; }
 
   .bubble {
-    padding: 12px 16px;
-    border-radius: 14px;
+    padding: 13px 16px;
+    border-radius: 16px;
     line-height: 1.5;
     max-width: 80%;
-    font-size: 1rem;
   }
 
   .msg-user .bubble {
-    background: #0C9A9A;
+    background: var(--bubble-user);
     color: white;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 5px;
   }
 
   .msg-nani .bubble {
-    background: #E8F4F3;
-    color: #4A453F;
-    border-bottom-left-radius: 4px;
+    background: var(--bubble-nani);
+    color: var(--text);
+    border-bottom-left-radius: 5px;
   }
 
-  /* Input box + button */
+  /* ------- INPUT AREA ------- */
   .input-row {
-    margin-top: 18px;
+    margin-top: 15px;
     display: flex;
     gap: 10px;
   }
@@ -87,32 +116,32 @@
   #nani-input {
     flex: 1;
     padding: 14px;
-    border: 1px solid #C9DAD8;
     border-radius: 10px;
-    font-size: 1rem;
+    border: 1px solid #C9DAD8;
   }
 
   #nani-send-btn {
-    width: 90px;
-    background: #0C9A9A;
-    border: none;
+    width: 85px;
+    background: var(--bubble-user);
     color: white;
+    border: none;
     border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  #nani-send-btn:hover {
-    background: #0A7C7C;
   }
 
   #nani-loader {
     text-align: center;
     margin-top: 10px;
-    color: #0C9A9A;
-    font-weight: 600;
     display: none;
+    color: var(--bubble-user);
+  }
+
+  /* ----- THEME SELECTOR ----- */
+  #theme-selector {
+    margin-top: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #CCE7E5;
   }
 
   @keyframes fadeIn {
@@ -123,20 +152,35 @@
 </head>
 
 <body>
+
+  <div class="header">
+    <div class="avatar"></div>
+    <div class="title">Nani-AI</div>
+    <div class="subtitle">Your Natural Wellness Guide</div>
+  </div>
+
   <div class="container">
-    <h2>🌿 Nani-AI</h2>
+
+    <!-- Theme selector -->
+    <select id="theme-selector">
+      <option value="auto">Auto Seasonal Mode 🌤️</option>
+      <option value="vata">Vata • Winter ❄️</option>
+      <option value="pitta">Pitta • Summer 🔥</option>
+      <option value="kapha">Kapha • Spring 🌱</option>
+    </select>
 
     <div id="nani-chat-box"></div>
 
     <div class="input-row">
-      <input id="nani-input" placeholder="What are you suffering from today?">
+      <input id="nani-input" placeholder="What are you suffering from?">
       <button id="nani-send-btn">Send</button>
     </div>
 
-    <div id="nani-loader">🌱 Preparing natural remedies...</div>
+    <div id="nani-loader">🌱 Preparing Nani’s wisdom...</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
 </body>
 </html>
+
