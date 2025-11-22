@@ -109,47 +109,53 @@ window.onload = () => {
 };
 window.sendToNani = sendToNani;
 
-/*******************************
- * SEASONAL AYURVEDIC THEMES
- *******************************/
-function applyTheme(theme) {
-  const root = document.documentElement;
+// ----------------------------------------
+// AUTO SEASONAL THEME (No UI control)
+// ----------------------------------------
+function applySeasonalTheme() {
+  const month = new Date().getMonth();
 
-  if (theme === "vata") {
-    root.style.setProperty("--bg", "#F8F3EF");
-    root.style.setProperty("--bubble-nani", "#EFE7DD");
-    root.style.setProperty("--bubble-user", "#7A9D96");
-    root.style.setProperty("--text", "#4A453F");
-  }
-  else if (theme === "pitta") {
-    root.style.setProperty("--bg", "#E8FAF8");
-    root.style.setProperty("--bubble-nani", "#DFF7F3");
-    root.style.setProperty("--bubble-user", "#0C9A9A");
-    root.style.setProperty("--text", "#1B3A3A");
-  }
-  else if (theme === "kapha") {
-    root.style.setProperty("--bg", "#FBF8E8");
-    root.style.setProperty("--bubble-nani", "#F3EED2");
-    root.style.setProperty("--bubble-user", "#C49A2E");
-    root.style.setProperty("--text", "#4A453F");
-  }
-  else {
-    // AUTO — detect by month
-    const month = new Date().getMonth();
+  let theme = {
+    bg: "#f0fdfa",
+    bubbleUser: "#d1fae5",
+    bubbleNani: "#e0f7f7",
+  };
 
-    if ([11,0,1].includes(month)) applyTheme("vata");
-    else if ([5,6,7,8].includes(month)) applyTheme("pitta");
-    else applyTheme("kapha");
+  if (month === 11 || month <= 1) {
+    // WINTER — Vata
+    theme.bg = "#f0f7ff";
+    theme.bubbleNani = "#e6f3ff";
+    theme.bubbleUser = "#dcecff";
+  } else if (month >= 2 && month <= 4) {
+    // SPRING — Kapha
+    theme.bg = "#f0fdf4";
+    theme.bubbleNani = "#d4f7d4";
+    theme.bubbleUser = "#d9fbd9";
+  } else if (month >= 5 && month <= 7) {
+    // SUMMER — Pitta
+    theme.bg = "#fffbea";
+    theme.bubbleNani = "#fff3c4";
+    theme.bubbleUser = "#ffe89c";
+  } else if (month >= 8 && month <= 10) {
+    // FALL — Vata/Pitta balance
+    theme.bg = "#fef6e4";
+    theme.bubbleNani = "#fde7c8";
+    theme.bubbleUser = "#f7d8ae";
   }
+
+  // Apply main background
+  document.body.style.background = theme.bg;
+
+  // Inject chat bubble colors
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .msg-user .bubble { background: ${theme.bubbleUser}; }
+    .msg-nani .bubble { background: ${theme.bubbleNani}; }
+  `;
+  document.head.appendChild(style);
 }
 
-// Initial apply
-applyTheme("auto");
-
-// Change theme on dropdown change
-document.getElementById("theme-selector").addEventListener("change", (e) => {
-  applyTheme(e.target.value);
-});
+applySeasonalTheme();
 
 
 
