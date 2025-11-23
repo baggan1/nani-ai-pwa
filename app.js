@@ -5,7 +5,13 @@
  * - Stripe Checkout launcher (no exposed key)
  * - Seasonal + Dark Mode UI
  ***************************************************/
-
+// ----------------------------
+// ENV VAR (from Vercel → Vite)
+// ----------------------------
+const API_SECRET = import.meta.env.VITE_API_SECRET;
+if (!API_SECRET) {
+  console.error("❌ Missing VITE_API_SECRET in Vercel environment variables");
+}
 
 // ----------------------------
 // DOM ELEMENTS
@@ -15,9 +21,8 @@ const inputField = document.getElementById("nani-input");
 const sendBtn = document.getElementById("nani-send-btn");
 const loader = document.getElementById("nani-loader");
 
-
 // ----------------------------
-// UTIL: Append messages
+// APPEND MESSAGES
 // ----------------------------
 function appendMessage(sender, text) {
   const wrapper = document.createElement("div");
@@ -28,13 +33,13 @@ function appendMessage(sender, text) {
       ${text.replace(/\n/g, "<br>")}
     </div>
   `;
+
   chatBox.appendChild(wrapper);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-
 // ----------------------------
-// MAIN CHAT FUNCTION
+// MAIN: SEND QUERY
 // ----------------------------
 async function sendToNani() {
   const query = inputField.value.trim();
@@ -47,7 +52,10 @@ async function sendToNani() {
   try {
     const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": API_SECRET
+      },
       body: JSON.stringify({
         query: query,
         match_threshold: 0.4,
@@ -68,65 +76,27 @@ async function sendToNani() {
   } catch (err) {
     loader.style.display = "none";
     appendMessage("nani", "⚠️ Network error. Please try again.");
-    console.error(err);
+    console.error("API error:", err);
   }
 }
-
-
-// ----------------------------
-// STRIPE CHECKOUT — NO API KEY ON FRONTEND
-// ----------------------------
-async function startSubscription() {
-  try {
-    const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        price_id: "price_xxxxx"    // replace with real Stripe price_id
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      alert("Unable to start checkout session.");
-    }
-
-  } catch (err) {
-    console.error("Checkout error:", err);
-  }
-}
-
-
-// Make function available globally for button onclick
-window.startSubscription = startSubscription;
-
 
 // ----------------------------
 // EVENTS
 // ----------------------------
 sendBtn.addEventListener("click", sendToNani);
-
 inputField.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendToNani();
 });
 
-window.onload = () => {
-  chatBox.scrollTop = chatBox.scrollHeight;
-};
+// Expose globally for HTML button
+window.sendToNani = sendToNani;
 
-
-// ---------------------------------------------------
-// AUTO SEASONAL THEME + DARK MODE SUPPORT
-// ---------------------------------------------------
-function applySeasonalTheme() {
-
-  // If dark mode → override everything
+// ----------------------------
+// SEASONAL / DARK MODE THEME
+// ----------------------------
+function applyTheme() {
   if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
     document.body.style.background = "#0f172a";
-
     const darkStyle = document.createElement("style");
     darkStyle.innerHTML = `
       .msg-user .bubble { background: #1e293b; color: #f1f5f9; }
@@ -136,7 +106,6 @@ function applySeasonalTheme() {
     return;
   }
 
-  // Seasonal colors for light mode
   const month = new Date().getMonth();
   let theme = {
     bg: "#f0fdfa",
@@ -148,15 +117,15 @@ function applySeasonalTheme() {
     theme.bg = "#f0f7ff";
     theme.bubbleNani = "#e6f3ff";
     theme.bubbleUser = "#dcecff";
-  } else if (2 <= month && month <= 4) {
+  } else if (month >= 2 && month <= 4) {
     theme.bg = "#f0fdf4";
     theme.bubbleNani = "#d4f7d4";
     theme.bubbleUser = "#d9fbd9";
-  } else if (5 <= month && month <= 7) {
+  } else if (month >= 5 && month <= 7) {
     theme.bg = "#fffbea";
     theme.bubbleNani = "#fff3c4";
     theme.bubbleUser = "#ffe89c";
-  } else {
+  } else if (month >= 8 && month <= 10) {
     theme.bg = "#fef6e4";
     theme.bubbleNani = "#fde7c8";
     theme.bubbleUser = "#f7d8ae";
@@ -172,6 +141,8 @@ function applySeasonalTheme() {
   document.head.appendChild(style);
 }
 
-applySeasonalTheme();
+applyTheme();
+
+
 
 
