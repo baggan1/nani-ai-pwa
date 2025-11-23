@@ -1,0 +1,65 @@
+body {
+  background: #f0fdfa;
+  margin: 0;
+  font-family: system-ui;
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+}
+
+.title {
+  font-size: 1.8rem;
+  color: #0d8f8f;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 16px;
+}
+
+#nani-chat-box {
+  height: 420px;
+  overflow-y: auto;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #d3d3d3;
+}
+
+.msg-user .bubble {
+  background: #d1fae5;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 12px;
+}
+
+.msg-nani .bubble {
+  background: #e0f7f7;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 12px;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: #14A1A1;
+  color: white;
+  border: none;
+}
