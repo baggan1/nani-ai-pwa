@@ -106,6 +106,27 @@
     border-bottom-left-radius: 5px;
   }
 
+  .subscribe-container {
+  text-align: center;
+  padding: 15px 0;
+}
+
+.subscribe-btn {
+  background: #0C9A9A;
+  color: #ffffff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  transition: 0.2s ease-in-out;
+}
+
+.subscribe-btn:hover {
+  background: #087c7c;
+}
+
   /* ------- INPUT AREA ------- */
   .input-row {
     margin-top: 15px;
@@ -135,6 +156,7 @@
     color: var(--bubble-user);
   }
 
+  
   /* ----- THEME SELECTOR ----- */
   #theme-selector {
     margin-top: 10px;
@@ -158,7 +180,13 @@
     <div class="title">Nani-AI</div>
     <div class="subtitle">Your Natural Wellness Guide</div>
   </div>
-
+ <!-- ⭐ Add subscribe button here -->
+  <div class="subscribe-container">
+    <button id="subscribe-btn" class="subscribe-btn">
+      🔒 Unlock Nani-AI Premium
+    </button>
+  </div>
+<!-- ⭐ End subscribe block -->
   <div class="container">
 
    <div id="nani-chat-box"></div>
@@ -169,11 +197,13 @@
     </div>
 
     <div id="nani-loader">🌱 Preparing Nani’s wisdom...</div>
+    
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 </body>
 </html>
+
 
 
