@@ -52,13 +52,14 @@
 <body>
   <div class="container">
     <h2>🌿 Nani-AI Wellness Assistant</h2>
-
     <div id="nani-chat-box"></div>
-
     <input id="nani-input" placeholder="What are you suffering from...">
     <button id="nani-send-btn">Send</button>
+	<div id="nani-loader" style="display:none; text-align:center; margin-top:10px; color:#0d8f8f;">
+	🌱 Preparing Nani’s wisdom...
+	</div>
   </div>
-
+	
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/app.js"></script>
   <link rel="stylesheet" href="/src/ui.css" />
