@@ -5,6 +5,7 @@
  * - Stripe Checkout launcher (no exposed key)
  * - Seasonal + Dark Mode UI
  ***************************************************/
+document.addEventListener("DOMContentLoaded", () => {
 // ----------------------------
 // ENV VAR (from Vercel → Vite)
 // ----------------------------
@@ -145,6 +146,7 @@ function applyTheme() {
 
 applyTheme();
 
+});
 
 
 
