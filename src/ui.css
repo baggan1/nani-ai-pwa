@@ -35,6 +35,21 @@ body {
   margin-top: 4px;
 }
 
+.avatar {
+  width: 70px;        /* Prevent large scaling */
+  height: 70px;
+  border-radius: 50%;
+  background-image: url("/icons/nani-avatar.png");
+  background-size: cover;
+  background-position: center;
+  margin: 0 auto 10px auto;
+  max-width: 20vw;
+  max-height: 20vw;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+
 /* ------------------------------------------
    CHAT BOX
 ------------------------------------------- */
