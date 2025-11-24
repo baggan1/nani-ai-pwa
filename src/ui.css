@@ -18,9 +18,23 @@ body {
 /* ------------------------------------------
    HEADER
 ------------------------------------------- */
+/* HEADER LAYOUT */
 .header {
-  text-align: center;
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 15px;
+  position: relative;
+  background: #f0fdfa; /* matches PWA */
+}
+
+.header-left {
+  margin-right: 15px;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -30,25 +44,47 @@ body {
 }
 
 .subtitle {
-  font-size: 1rem;
-  color: #287b7b;
-  margin-top: 4px;
+  font-size: 0.95rem;
+  color: #116666;
+  margin-top: 3px;
 }
 
+/* Avatar */
 .avatar {
-  width: 70px;        /* Prevent large scaling */
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-image: url("/icons/nani-avatar.png");
   background-size: cover;
   background-position: center;
-  margin: 0 auto 10px auto;
-  max-width: 20vw;
-  max-height: 20vw;
-  min-width: 50px;
-  min-height: 50px;
 }
 
+/* Account Button */
+.account-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: #14A1A1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+@media (max-width: 420px) {
+  .title {
+    font-size: 1.4rem;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+}
 
 /* ------------------------------------------
    CHAT BOX
