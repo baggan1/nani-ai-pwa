@@ -100,6 +100,46 @@ document.addEventListener("DOMContentLoaded", () => {
   // Expose function globally (optional)
   window.sendToNani = sendToNani;
 
+// ----------------------------
+// STRIPE SUBSCRIPTION HANDLER
+// ----------------------------
+const subscribeBtn = document.getElementById("subscribe-btn");
+
+if (subscribeBtn) {
+  subscribeBtn.addEventListener("click", async () => {
+
+    subscribeBtn.disabled = true;
+    subscribeBtn.innerText = "Redirecting...";
+
+    try {
+      const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_SECRET
+        },
+        body: JSON.stringify({
+          price_id: import.meta.env.VITE_STRIPE_PRICE_ID
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert("Something went wrong: " + data.error);
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Network problem. Please try again.");
+    }
+
+    subscribeBtn.disabled = false;
+    subscribeBtn.innerText = "💎 Unlock Nani-AI Premium";
+  });
+}
 
   // ----------------------------
   // THEME — Auto Seasonal + Dark Mode

@@ -20,6 +20,26 @@ body {
   padding: 16px;
 }
 
+.subscribe-btn {
+  background: linear-gradient(90deg, #ec4899, #a855f7);
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(172, 32, 144, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.subscribe-btn:hover {
+  transform: translateY(-2px);
+}
+
+
 #nani-chat-box {
   height: 420px;
   overflow-y: auto;
