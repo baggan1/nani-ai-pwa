@@ -45,6 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const query = inputField.value.trim();
     if (!query) return;
+	
+	//Read email (optional)
+	const email = document.getElementById("nani-email").value.trim() || null;
 
     appendMessage("user", query);
     inputField.value = "";
@@ -59,9 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
           "X-API-KEY": API_SECRET
         },
         body: JSON.stringify({
-          query: query,
-          match_threshold: 0.4,
-          match_count: 3
+			query: query,
+			email: email,           // ← SEND EMAIL TO BACKEND
+			match_threshold: 0.4,
+			match_count: 3
         })
       });
 
