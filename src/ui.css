@@ -1,171 +1,248 @@
-/* GENERAL */
+/* ------------------------------------------
+   GLOBAL APP LAYOUT
+------------------------------------------- */
 body {
   margin: 0;
   padding: 0;
   font-family: system-ui, sans-serif;
-  transition: background 0.4s ease;
+  background: #f6fdfb; /* SOFT LIGHT GREEN BACKGROUND */
+  color: #0a3d3d;      /* DARK TEAL TEXT */
 }
 
-/* FREE TRIAL */
-.trial-container {
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 25px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 5px 22px rgba(0,0,0,0.07);
-  text-align: center;
+.container {
+  max-width: 520px;
+  margin: auto;
+  padding: 20px;
 }
 
-.trial-header {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #0d8f8f;
-}
-
-.trial-sub {
-  color: #444;
-  margin-bottom: 20px;
-}
-
-.trial-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #bbb;
-  margin-bottom: 15px;
-}
-
-.trial-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background: #14A1A1;
-  color: white;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.trial-error {
-  font-size: 0.9rem;
-  display: none;
-  margin-top: 10px;
-}
-
-/* CHAT APP */
+/* ------------------------------------------
+   HEADER
+------------------------------------------- */
 .header {
   text-align: center;
-  padding: 30px 0;
-}
-
-.avatar {
-  width: 80px;
-  border-radius: 50%;
-  border: 3px solid #14A1A1;
+  margin-bottom: 20px;
 }
 
 .title {
   font-size: 1.6rem;
-  margin-top: 10px;
-  font-weight: bold;
+  font-weight: 700;
   color: #0d8f8f;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #555;
+  color: #287b7b;
+  margin-top: 4px;
 }
 
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 10px;
-}
-
+/* ------------------------------------------
+   CHAT BOX
+------------------------------------------- */
 #nani-chat-box {
   height: 420px;
   overflow-y: auto;
-  background: white;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #d2d2d2;
-  margin-bottom: 12px;
+  background: #ffffff;
+  border: 1px solid #c7e7e7;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 20px;
 }
 
-.input-row {
-  display: flex;
-  gap: 10px;
-}
-
-input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 12px 16px;
-  background: #14A1A1;
-  color: white;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.loader {
-  margin-top: 10px;
-  text-align: center;
-  display: none;
-}
-
-/* CHAT BUBBLES */
-.msg-user {
-  display: flex;
-  justify-content: flex-end;
-}
-.msg-nani {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.bubble {
-  padding: 10px 14px;
-  border-radius: 12px;
-  margin: 6px 0;
-  max-width: 80%;
-  line-height: 1.4;
-}
-
+/* ------------------------------------------
+   CHAT BUBBLES
+------------------------------------------- */
 .msg-user .bubble {
-  background: #d1fae5;
+  background: #d4f7e2;     /* LIGHT MINT GREEN */
+  color: #0a3d3d;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
 }
 
 .msg-nani .bubble {
-  background: #e0f7f7;
+  background: #e3f8f8;     /* LIGHT TEAL */
+  color: #0a3d3d;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
 }
 
-/* DARK MODE */
-body.dark-mode {
-  background: #0f172a;
+/* ------------------------------------------
+   INPUT + BUTTON ROW
+------------------------------------------- */
+.input-row {
+  display: flex;
+  gap: 8px;
 }
 
-body.dark-mode .bubble {
-  color: #f8fafc !important;
+#nani-input {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #bcdcdc;
 }
 
-body.dark-mode .msg-user .bubble {
-  background: #1e293b;
+#nani-send-btn,
+#start-trial-btn,
+#subscribe-btn {
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #14A1A1;
+  color: white;
+  cursor: pointer;
 }
 
-body.dark-mode .msg-nani .bubble {
-  background: #334155;
+#nani-send-btn:hover,
+#start-trial-btn:hover,
+#subscribe-btn:hover {
+  background: #0e7f7f;
 }
 
-/* SEASONAL THEMES */
-body.winter { background: #f0f7ff; }
-body.spring { background: #f0fdf4; }
-body.summer { background: #fffbea; }
-body.fall   { background: #fef6e4; }
+/* ------------------------------------------
+   LOADER
+------------------------------------------- */
+#nani-loader {
+  display: none;
+  margin-top: 14px;
+  text-align: center;
+  color: #0d8f8f;
+}
+
+/* ------------------------------------------
+   EMAIL SCREEN
+------------------------------------------- */
+#email-screen {
+  text-align: center;
+  margin-top: 40px;
+}
+
+#email-screen input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid #ceeaea;
+}
+
+.error-msg {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+/* ------------------------------------------
+   TRIAL EXPIRED BOX
+------------------------------------------- */
+#trial-expired {
+  padding: 16px;
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#trial-expired h3 {
+  color: #b06500;
+  margin-bottom: 10px;
+}
+
+/* ------------------------------------------
+   DARK MODE SUPPORT
+------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+
+  body {
+    background: #0f1b26;
+    color: #e7f5f5;
+  }
+
+  #nani-chat-box {
+    background: #13222e;
+    border-color: #204458;
+  }
+
+  .msg-user .bubble {
+    background: #1e3a4a;
+    color: #dceff0;
+  }
+
+  .msg-nani .bubble {
+    background: #26485d;
+    color: #e8fbfb;
+  }
+
+  #nani-input {
+    background: #10202c;
+    color: #e8fbfb;
+    border: 1px solid #35596b;
+  }
+
+  button {
+    background: #158b8b;
+  }
+}
+/* -------------------------------
+   ACCOUNT PANEL
+--------------------------------*/
+.account-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #14A1A1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.account-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.account-panel.hidden {
+  display: none;
+}
+
+.panel-content {
+  background: white;
+  width: 85%;
+  max-width: 380px;
+  border-radius: 14px;
+  padding: 20px;
+  color: #0a3d3d;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+
+.close-btn, .subscribe-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 10px;
+  border: none;
+}
+
+.subscribe-btn {
+  background: #14A1A1;
+  color: white;
+}
+
+.close-btn {
+  background: #ccc;
+  color: #222;
+}

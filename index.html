@@ -32,6 +32,7 @@
       <img src="/icons/nani-avatar.png" class="avatar" />
       <div class="title">Nani-AI</div>
       <div class="subtitle">Your Natural Wellness Guide</div>
+	  <button id="account-btn" class="account-btn">Account</button>
     </div>
 
     <div class="container">
@@ -45,6 +46,23 @@
       <div id="nani-loader" class="loader">🌱 Preparing Nani’s wisdom...</div>
     </div>
   </div>
+	
+	<!-- ACCOUNT PANEL MODAL -->
+    <div id="account-panel" class="account-panel hidden">
+		<div class="panel-content">
+
+			<h2>Your Account</h2>
+
+			<p><strong>Email:</strong> <span id="acc-email">—</span></p>
+			<p><strong>Trial Status:</strong> <span id="acc-trial-status">—</span></p>
+			<p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
+			<p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
+
+		<button id="acc-subscribe-btn" class="subscribe-btn hidden">Subscribe</button>
+
+		<button id="acc-close" class="close-btn">Close</button>
+		</div>
+	</div>
 
   <!-- Supabase + Front-End App -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -170,3 +170,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyTheme();
 });
+
+// ----------------------------
+// ACCOUNT PANEL UI
+// ----------------------------
+const accountBtn = document.getElementById("account-btn");
+const accountPanel = document.getElementById("account-panel");
+const accEmail = document.getElementById("acc-email");
+const accTrialStatus = document.getElementById("acc-trial-status");
+const accDaysLeft = document.getElementById("acc-days-left");
+const accSubStatus = document.getElementById("acc-sub-status");
+const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
+const accCloseBtn = document.getElementById("acc-close");
+
+// Open account panel
+accountBtn.addEventListener("click", async () => {
+  const email = localStorage.getItem("nani_email");
+
+  if (!email) {
+    accEmail.textContent = "Not registered";
+    accTrialStatus.textContent = "No trial found";
+    accDaysLeft.textContent = "—";
+    accSubStatus.textContent = "Not subscribed";
+    accSubscribeBtn.classList.remove("hidden");
+  } else {
+    // Fetch status from backend
+    const res = await fetch(
+      `https://naturopathy.onrender.com/auth/status?email=${email}`
+    );
+    const data = await res.json();
+
+    accEmail.textContent = email;
+    accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
+    accDaysLeft.textContent = data.days_left;
+    accSubStatus.textContent = data.subscribed ? "Active Subscriber" : "Not Subscribed";
+
+    if (!data.subscribed) {
+      accSubscribeBtn.classList.remove("hidden");
+    }
+  }
+
+  accountPanel.classList.remove("hidden");
+});
+
+// Close panel
+accCloseBtn.addEventListener("click", () => {
+  accountPanel.classList.add("hidden");
+});
+
+// Subscribe button
+accSubscribeBtn.addEventListener("click", () => {
+  window.location.href = "/subscribe"; // or Stripe checkout link
+});
