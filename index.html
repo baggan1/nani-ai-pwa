@@ -1,73 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Nani-AI Wellness Assistant</title>
 
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#14A1A1">
-  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#14A1A1" />
+  <link rel="icon" href="/icons/icon-192.png" />
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, sans-serif;
-      background: #f0fdfa;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 15px;
-    }
-    h2 {
-      color: #0d8f8f;
-      text-align: center;
-    }
-    #chat-box {
-      height: 400px;
-      overflow-y: auto;
-      background: white;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #d2d2d2;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      background: #14A1A1;
-      color: white;
-      border: none;
-    }
-  </style>
+  <link rel="stylesheet" href="/src/ui.css" />
 </head>
 
 <body>
-  <div class="container">
-    <h2>🌿 Nani-AI Wellness Assistant</h2>
-	
-	<button id="subscribe-btn" class="subscribe-btn">
-    💎 Unlock Nani-AI Premium
-    </button>
-	<input id="nani-email" placeholder="Enter your email (optional)">
-    <div id="nani-chat-box"></div>
-    <input id="nani-input" placeholder="What are you suffering from...">
-    <button id="nani-send-btn">Send</button>
-	<div id="nani-loader" style="display:none; text-align:center; margin-top:10px; color:#0d8f8f;">
-	🌱 Preparing Nani’s wisdom...
-	</div>
+
+  <!-- 🌿 FREE TRIAL SCREEN -->
+  <div id="trial-screen" class="trial-container">
+    <div class="trial-header">🌿 Welcome to Nani-AI</div>
+    <p class="trial-sub">Start your <strong>free 15-day trial</strong><br>No credit card needed.</p>
+
+    <input id="trial-email" type="email" placeholder="Enter your email" class="trial-input" />
+    <button id="trial-submit-btn" class="trial-btn">Start Free Trial</button>
+
+    <p id="trial-error" class="trial-error"></p>
   </div>
-	
+
+  <!-- 🌿 CHAT APP (Hidden until trial activated) -->
+  <div id="chat-app" style="display:none;">
+    <div class="header">
+      <img src="/icons/nani-avatar.png" class="avatar" />
+      <div class="title">Nani-AI</div>
+      <div class="subtitle">Your Natural Wellness Guide</div>
+    </div>
+
+    <div class="container">
+      <div id="nani-chat-box"></div>
+
+      <div class="input-row">
+        <input id="nani-input" placeholder="What are you suffering from?" />
+        <button id="nani-send-btn">Send</button>
+      </div>
+
+      <div id="nani-loader" class="loader">🌱 Preparing Nani’s wisdom...</div>
+    </div>
+  </div>
+
+  <!-- Supabase + Front-End App -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/app.js"></script>
-  <link rel="stylesheet" href="/src/ui.css" />
-
 </body>
 </html>
