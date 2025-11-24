@@ -6,43 +6,50 @@
 
   <title>Nani-AI Wellness Assistant</title>
 
+  <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#14A1A1" />
   <link rel="icon" href="/icons/icon-192.png" />
 
+  <!-- Styles -->
   <link rel="stylesheet" href="/src/ui.css" />
 </head>
 
 <body>
 
-  <!-- 🌿 FREE TRIAL SCREEN -->
-	<div id="welcome-screen" class="welcome-screen">
-		<img src="/icons/nani-avatar.png" class="welcome-avatar" />
+  <!-- 🌿 WELCOME / FREE TRIAL SCREEN -->
+  <div id="trial-screen" class="welcome-screen">
+    <img src="/icons/nani-avatar.png" class="welcome-avatar" />
 
-		<h1 class="welcome-title">Welcome to Nani-AI</h1>
-		<p class="welcome-subtitle">
-			Your natural wellness guide. Start your 7-day free trial — no credit card required.
-		</p>
+    <h1 class="welcome-title">Welcome to Nani-AI</h1>
+    <p class="welcome-subtitle">
+      Your natural wellness guide.<br>Start your 7-day free trial — no credit card required.
+    </p>
 
-	<input id="trial-email" type="email" placeholder="Enter your email" />
-	<button id="start-trial-btn">Start Free Trial</button>
-</div>
+    <input id="trial-email" type="email" placeholder="Enter your email" />
+    <p id="trial-error" class="error-msg" style="display:none;"></p>
 
-  <!-- 🌿 CHAT APP (Hidden until trial activated) -->
+    <button id="trial-submit-btn">Start Free Trial</button>
+  </div>
+
+  <!-- 🌿 MAIN CHAT APP (Hidden until trial/email exists) -->
   <div id="chat-app" style="display:none;">
-	<div class="header">
-		<div class="header-content">
-			<div class="avatar"></div>
 
-		<div class="title">Nani-AI</div>
-		<div class="subtitle">Your Natural Wellness Guide</div>
-	</div>
+    <!-- Header -->
+    <div class="header">
+      <div class="avatar-container">
+        <img src="/icons/nani-avatar.png" class="avatar-img" />
+      </div>
 
-  <button id="account-btn" class="account-btn">Account</button>
-</div>
+      <div class="header-text">
+        <div class="title">Nani-AI</div>
+        <div class="subtitle">Your Natural Wellness Guide</div>
+      </div>
 
+      <button id="account-btn" class="account-btn">Account</button>
+    </div>
 
-
+    <!-- Chat Container -->
     <div class="container">
       <div id="nani-chat-box"></div>
 
@@ -54,26 +61,27 @@
       <div id="nani-loader" class="loader">🌱 Preparing Nani’s wisdom...</div>
     </div>
   </div>
-	
-	<!-- ACCOUNT PANEL MODAL -->
-    <div id="account-panel" class="account-panel hidden">
-		<div class="panel-content">
 
-			<h2>Your Account</h2>
+  <!-- 🌿 ACCOUNT PANEL MODAL -->
+  <div id="account-panel" class="account-panel hidden">
+    <div class="panel-content">
 
-			<p><strong>Email:</strong> <span id="acc-email">—</span></p>
-			<p><strong>Trial Status:</strong> <span id="acc-trial-status">—</span></p>
-			<p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
-			<p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
+      <h2>Your Account</h2>
 
-		<button id="acc-subscribe-btn" class="subscribe-btn hidden">Subscribe</button>
+      <p><strong>Email:</strong> <span id="acc-email">—</span></p>
+      <p><strong>Trial Status:</strong> <span id="acc-trial-status">—</span></p>
+      <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
+      <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
 
-		<button id="acc-close" class="close-btn">Close</button>
-		</div>
-	</div>
+      <button id="acc-subscribe-btn" class="subscribe-btn hidden">Subscribe</button>
+      <button id="acc-close" class="close-btn">Close</button>
 
-  <!-- Supabase + Front-End App -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/app.js"></script>
+
 </body>
 </html>

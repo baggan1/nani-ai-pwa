@@ -1,48 +1,65 @@
 /***************************************************
  * NANI-AI PWA — Email-Only Free Trial Edition
+ * - Free Trial
  * - Secure API calls
- * - Email gating
+ * - Account Panel
  * - Seasonal + Dark Mode themes
  ***************************************************/
 document.addEventListener("DOMContentLoaded", () => {
 
-  // -------------------------
-  // ENV (from Vercel → Vite)
-  // -------------------------
+  /* ------------------------------
+     ENV (Vercel → Vite)
+  ------------------------------ */
   const API_SECRET = import.meta.env.VITE_API_SECRET;
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // -------------------------
-  // DOM Elements
-  // -------------------------
-  const chatBox     = document.getElementById("nani-chat-box");
-  const inputField  = document.getElementById("nani-input");
-  const sendBtn     = document.getElementById("nani-send-btn");
-  const loader      = document.getElementById("nani-loader");
-
+  /* ------------------------------
+     DOM ELEMENTS
+  ------------------------------ */
   const trialScreen = document.getElementById("trial-screen");
-  const chatApp     = document.getElementById("chat-app");
-  const trialEmail  = document.getElementById("trial-email");
-  const trialError  = document.getElementById("trial-error");
-  const trialBtn    = document.getElementById("trial-submit-btn");
+  const trialEmailInput = document.getElementById("trial-email");
+  const trialError = document.getElementById("trial-error");
+  const trialBtn = document.getElementById("trial-submit-btn");
 
-  // Store logged-in email
-  let userEmail = localStorage.getItem("nani_user_email");
+  const appContainer = document.getElementById("chat-app");
+  const chatBox = document.getElementById("nani-chat-box");
+  const inputField = document.getElementById("nani-input");
+  const sendBtn = document.getElementById("nani-send-btn");
+  const loader = document.getElementById("nani-loader");
 
-  // If already logged in, show chat
-  if (userEmail) {
+  /* ------------------------------
+     ACCOUNT PANEL (DOM)
+  ------------------------------ */
+  const accountBtn = document.getElementById("account-btn");
+  const accountPanel = document.getElementById("account-panel");
+  const accEmail = document.getElementById("acc-email");
+  const accTrialStatus = document.getElementById("acc-trial-status");
+  const accDaysLeft = document.getElementById("acc-days-left");
+  const accSubStatus = document.getElementById("acc-sub-status");
+  const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
+  const accCloseBtn = document.getElementById("acc-close");
+
+  /* ------------------------------
+     LOAD USER SESSION
+  ------------------------------ */
+  let userEmail = localStorage.getItem("nani_email");
+
+  if (!userEmail) {
+    trialScreen.style.display = "block";
+    appContainer.style.display = "none";
+  } else {
     trialScreen.style.display = "none";
-    chatApp.style.display = "block";
+    appContainer.style.display = "block";
   }
 
-  // -------------------------
-  // FREE TRIAL HANDLER
-  // -------------------------
+  /* ------------------------------
+     FREE TRIAL HANDLER
+  ------------------------------ */
   async function startFreeTrial() {
-    const email = trialEmail.value.trim();
+    const email = trialEmailInput.value.trim();
 
     if (!email || !email.includes("@")) {
       trialError.innerText = "Please enter a valid email.";
@@ -70,26 +87,27 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Save session
+      // Save email
       userEmail = email;
-      localStorage.setItem("nani_user_email", email);
+      localStorage.setItem("nani_email", email);
 
       // Switch screens
       trialScreen.style.display = "none";
-      chatApp.style.display = "block";
+      appContainer.style.display = "block";
 
-    } catch (e) {
-      trialError.innerText = "Network error. Please try again.";
+    } catch (err) {
+      console.error("Trial start failed:", err);
+      trialError.innerText = "Network error. Try again.";
       trialError.style.display = "block";
     }
   }
 
   trialBtn.addEventListener("click", startFreeTrial);
+  window.startFreeTrial = startFreeTrial;
 
-
-  // -------------------------
-  // Append Messages
-  // -------------------------
+  /* ------------------------------
+     APPEND MESSAGES
+  ------------------------------ */
   function appendMessage(sender, text) {
     const wrapper = document.createElement("div");
     wrapper.className = sender === "user" ? "msg-user" : "msg-nani";
@@ -99,14 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
         ${text.replace(/\n/g, "<br>")}
       </div>
     `;
+
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-
-  // -------------------------
-  // Send Query to Backend
-  // -------------------------
+  /* ------------------------------
+     SEND TO NANI API
+  ------------------------------ */
   async function sendToNani() {
     const query = inputField.value.trim();
     if (!query) return;
@@ -147,14 +165,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   sendBtn.addEventListener("click", sendToNani);
-  inputField.addEventListener("keypress", e => {
+  inputField.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendToNani();
   });
 
+  /* ------------------------------
+     ACCOUNT PANEL LOGIC
+  ------------------------------ */
+  accountBtn.addEventListener("click", async () => {
+    const email = localStorage.getItem("nani_email");
 
-  // -------------------------
-  // THEMING (Dark + Seasonal)
-  // -------------------------
+    if (!email) {
+      accEmail.textContent = "Not logged in";
+      accTrialStatus.textContent = "—";
+      accDaysLeft.textContent = "—";
+      accSubStatus.textContent = "Not subscribed";
+      accSubscribeBtn.classList.remove("hidden");
+      accountPanel.classList.remove("hidden");
+      return;
+    }
+
+    // Fetch status
+    const res = await fetch(`https://naturopathy.onrender.com/auth/status?email=${email}`);
+    const data = await res.json();
+
+    accEmail.textContent = email;
+    accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
+    accDaysLeft.textContent = data.days_left + " days left";
+    accSubStatus.textContent = data.subscribed ? "Subscribed" : "Not Subscribed";
+
+    if (!data.subscribed) {
+      accSubscribeBtn.classList.remove("hidden");
+    }
+
+    accountPanel.classList.remove("hidden");
+  });
+
+  accCloseBtn.addEventListener("click", () => {
+    accountPanel.classList.add("hidden");
+  });
+
+  accSubscribeBtn.addEventListener("click", () => {
+    window.location.href = "/subscribe"; // Stripe UI later
+  });
+
+  /* ------------------------------
+     THEMES (Dark + Seasonal)
+  ------------------------------ */
   function applyTheme() {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       document.body.classList.add("dark-mode");
@@ -169,56 +226,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   applyTheme();
-});
-
-// ----------------------------
-// ACCOUNT PANEL UI
-// ----------------------------
-const accountBtn = document.getElementById("account-btn");
-const accountPanel = document.getElementById("account-panel");
-const accEmail = document.getElementById("acc-email");
-const accTrialStatus = document.getElementById("acc-trial-status");
-const accDaysLeft = document.getElementById("acc-days-left");
-const accSubStatus = document.getElementById("acc-sub-status");
-const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
-const accCloseBtn = document.getElementById("acc-close");
-
-// Open account panel
-accountBtn.addEventListener("click", async () => {
-  const email = localStorage.getItem("nani_email");
-
-  if (!email) {
-    accEmail.textContent = "Not registered";
-    accTrialStatus.textContent = "No trial found";
-    accDaysLeft.textContent = "—";
-    accSubStatus.textContent = "Not subscribed";
-    accSubscribeBtn.classList.remove("hidden");
-  } else {
-    // Fetch status from backend
-    const res = await fetch(
-      `https://naturopathy.onrender.com/auth/status?email=${email}`
-    );
-    const data = await res.json();
-
-    accEmail.textContent = email;
-    accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
-    accDaysLeft.textContent = data.days_left;
-    accSubStatus.textContent = data.subscribed ? "Active Subscriber" : "Not Subscribed";
-
-    if (!data.subscribed) {
-      accSubscribeBtn.classList.remove("hidden");
-    }
-  }
-
-  accountPanel.classList.remove("hidden");
-});
-
-// Close panel
-accCloseBtn.addEventListener("click", () => {
-  accountPanel.classList.add("hidden");
-});
-
-// Subscribe button
-accSubscribeBtn.addEventListener("click", () => {
-  window.location.href = "/subscribe"; // or Stripe checkout link
 });
