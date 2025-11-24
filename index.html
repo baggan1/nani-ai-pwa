@@ -16,30 +16,31 @@
 <body>
 
   <!-- 🌿 FREE TRIAL SCREEN -->
-  <div id="trial-screen" class="trial-container">
-    <div class="trial-header">🌿 Welcome to Nani-AI</div>
-    <p class="trial-sub">Start your <strong>free 15-day trial</strong><br>No credit card needed.</p>
+	<div id="welcome-screen" class="welcome-screen">
+		<img src="/icons/nani-avatar.png" class="welcome-avatar" />
 
-    <input id="trial-email" type="email" placeholder="Enter your email" class="trial-input" />
-    <button id="trial-submit-btn" class="trial-btn">Start Free Trial</button>
+		<h1 class="welcome-title">Welcome to Nani-AI</h1>
+		<p class="welcome-subtitle">
+			Your natural wellness guide. Start your 7-day free trial — no credit card required.
+		</p>
 
-    <p id="trial-error" class="trial-error"></p>
-  </div>
+	<input id="trial-email" type="email" placeholder="Enter your email" />
+	<button id="start-trial-btn">Start Free Trial</button>
+</div>
 
   <!-- 🌿 CHAT APP (Hidden until trial activated) -->
   <div id="chat-app" style="display:none;">
-    <div class="header">
-		<div class="header-left">
+	<div class="header">
+		<div class="header-content">
 			<div class="avatar"></div>
-	</div>
 
-	<div class="header-right">
 		<div class="title">Nani-AI</div>
 		<div class="subtitle">Your Natural Wellness Guide</div>
 	</div>
 
-	<button id="account-btn" class="account-btn">Account</button>
+  <button id="account-btn" class="account-btn">Account</button>
 </div>
+
 
 
     <div class="container">
