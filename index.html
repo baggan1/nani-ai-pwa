@@ -6,57 +6,40 @@
 
   <title>Nani-AI Wellness Assistant</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#14A1A1" />
   <link rel="icon" href="/icons/icon-192.png" />
 
-  <!-- Styles -->
   <link rel="stylesheet" href="/src/ui.css" />
 </head>
-
 <body>
-
-  <!-- 🌿 AUTH / WELCOME SCREEN -->
-  <div id="auth-screen" class="welcome-screen">
-    <img src="/icons/nani-avatar.png" class="welcome-avatar" />
+  <!-- 🌿 WELCOME / AUTH SCREEN -->
+  <div id="welcome-screen" class="welcome-screen">
+    <img src="/icons/nani-avatar.png" class="welcome-avatar" alt="Nani-AI Avatar" />
 
     <h1 class="welcome-title">Welcome to Nani-AI</h1>
     <p class="welcome-subtitle">
-      Your natural wellness guide. Enjoy a 7-day free trial — no password to remember.
+      Your natural wellness guide. Start with a 7-day free trial using your email.
     </p>
 
-    <input id="auth-email" type="email" placeholder="Continue with email (magic link)" />
-    <button id="email-login-btn">Send Magic Link</button>
-
-    <div style="margin: 8px 0; font-size: 0.9rem; color: #666;">or</div>
-
-    <button id="google-login-btn" style="width:100%; padding:12px; border-radius:8px; border:none; background:#ffffff; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
-      <span>🔐 Continue with Google</span>
-    </button>
-
-    <p id="auth-message" class="error-msg" style="display:none;"></p>
+    <input id="trial-email" type="email" placeholder="Enter your email" />
+    <button id="start-trial-btn">Send Magic Link</button>
+    <div id="trial-error" class="error-msg"></div>
+    <p id="trial-note" class="welcome-note"></p>
   </div>
 
-  <!-- 🌿 MAIN CHAT APP (Shown when authenticated) -->
-  <div id="chat-app" style="display:none;">
-
-    <!-- Header -->
-    <div class="header">
-      <div class="avatar-container">
-        <img src="/icons/nani-avatar.png" class="avatar-img" />
-      </div>
-
-      <div class="header-text">
+  <!-- 🌿 MAIN CHAT APP (Hidden until logged in) -->
+  <div id="chat-app" style="display: none;">
+    <header class="header">
+      <div class="header-content">
+        <div class="avatar"></div>
         <div class="title">Nani-AI</div>
         <div class="subtitle">Your Natural Wellness Guide</div>
       </div>
-
       <button id="account-btn" class="account-btn">Account</button>
-    </div>
+    </header>
 
-    <!-- Chat Container -->
-    <div class="container">
+    <main class="container">
       <div id="nani-chat-box"></div>
 
       <div class="input-row">
@@ -65,10 +48,10 @@
       </div>
 
       <div id="nani-loader" class="loader">🌱 Preparing Nani’s wisdom...</div>
-    </div>
+    </main>
   </div>
 
-  <!-- 🌿 ACCOUNT PANEL MODAL -->
+  <!-- ACCOUNT PANEL MODAL -->
   <div id="account-panel" class="account-panel hidden">
     <div class="panel-content">
       <h2>Your Account</h2>
@@ -78,12 +61,14 @@
       <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
       <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
 
-      <button id="acc-subscribe-btn" class="subscribe-btn hidden">Subscribe</button>
+      <button id="acc-subscribe-btn" class="subscribe-btn hidden">
+        Subscribe
+      </button>
       <button id="acc-close" class="close-btn">Close</button>
     </div>
   </div>
 
-  <!-- Supabase + App Script -->
+  <!-- Supabase + Front-End App -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/app.js"></script>
 </body>

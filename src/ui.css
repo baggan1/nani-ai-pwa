@@ -5,9 +5,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: system-ui, sans-serif;
-  background: #f6fdfb; /* SOFT LIGHT GREEN BACKGROUND */
-  color: #0a3d3d;      /* DARK TEAL TEXT */
-  transition: background 0.3s ease;
+  background: #f6fdfb; /* soft light green */
+  color: #0a3d3d;      /* dark teal */
 }
 
 .container {
@@ -16,47 +15,46 @@ body {
   padding: 20px;
 }
 
-/* ---------------------------------------------------
-   HEADER — CENTERED AVATAR + TITLE + SUBTITLE
------------------------------------------------------ */
+.hidden {
+  display: none;
+}
+
+/* ------------------------------------------
+   HEADER
+------------------------------------------- */
 .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 18px 10px;
-  background: #f0fdfa;
-  border-bottom: 1px solid #c7e7e7;
   position: relative;
+  padding: 20px 15px;
+  background: #f0fdfa;
+  text-align: center;
 }
 
-.avatar-container {
-  margin-right: 12px;
-}
-
-.avatar-img {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-}
-
-.header-text {
-  display: flex;
+.header-content {
+  display: inline-flex;
   flex-direction: column;
-  text-align: left;
+  align-items: center;
+  gap: 4px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-image: url("/icons/nani-avatar.png");
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 4px;
 }
 
 .title {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 700;
   color: #0d8f8f;
-  margin: 0;
-  padding: 0;
 }
 
 .subtitle {
   font-size: 0.95rem;
   color: #116666;
-  margin-top: 3px;
 }
 
 /* Account Button (top-right) */
@@ -64,12 +62,12 @@ body {
   position: absolute;
   right: 15px;
   top: 15px;
-  background: #14A1A1;
+  background: #14a1a1;
   color: white;
   border: none;
-  padding: 7px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
@@ -84,30 +82,27 @@ body {
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 20px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
 /* ------------------------------------------
    CHAT BUBBLES
 ------------------------------------------- */
 .msg-user .bubble {
-  background: #d4f7e2;     /* LIGHT MINT GREEN */
+  background: #d4f7e2;
   color: #0a3d3d;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 10px;
   white-space: pre-wrap;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
 }
 
 .msg-nani .bubble {
-  background: #e3f8f8;     /* LIGHT TEAL */
+  background: #e3f8f8;
   color: #0a3d3d;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 10px;
   white-space: pre-wrap;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
 }
 
 /* ------------------------------------------
@@ -126,28 +121,24 @@ body {
   border: 1px solid #bcdcdc;
 }
 
-#nani-send-btn,
-#trial-submit-btn,
-.subscribe-btn {
+#nani-send-btn {
   padding: 12px 16px;
   font-size: 1rem;
   border-radius: 10px;
   border: none;
-  background: #14A1A1;
+  background: #14a1a1;
   color: white;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-#nani-send-btn:hover,
-#trial-submit-btn:hover,
-.subscribe-btn:hover {
+#nani-send-btn:hover {
   background: #0e7f7f;
 }
 
 /* ------------------------------------------
    LOADER
 ------------------------------------------- */
+.loader,
 #nani-loader {
   display: none;
   margin-top: 14px;
@@ -156,14 +147,13 @@ body {
 }
 
 /* ------------------------------------------
-   WELCOME / TRIAL SCREEN
+   WELCOME / AUTH SCREEN
 ------------------------------------------- */
 .welcome-screen {
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px 20px 20px;
   max-width: 420px;
   margin: 0 auto;
-  animation: fadeIn 0.4s ease;
 }
 
 .welcome-avatar {
@@ -187,35 +177,37 @@ body {
   line-height: 1.45;
 }
 
-#welcome-screen input,
-#trial-screen input {
+#welcome-screen input {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
-#welcome-screen button,
-#trial-screen button {
+#welcome-screen button {
   width: 100%;
   padding: 12px;
   margin-top: 12px;
   border: none;
-  background: #14A1A1;
+  background: #14a1a1;
   color: white;
   border-radius: 8px;
   font-size: 1.05rem;
   cursor: pointer;
 }
 
-/* ------------------------------------------
-   ERROR MESSAGE
-------------------------------------------- */
 .error-msg {
-  color: red;
+  color: #b91c1c;
   font-size: 0.9rem;
   margin-top: 6px;
+}
+
+.welcome-note {
+  font-size: 0.9rem;
+  color: #0f766e;
+  margin-top: 10px;
 }
 
 /* ------------------------------------------
@@ -228,11 +220,11 @@ body {
   width: 100%;
   height: 100%;
   backdrop-filter: blur(6px);
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 150;
+  z-index: 100;
 }
 
 .account-panel.hidden {
@@ -246,87 +238,79 @@ body {
   border-radius: 14px;
   padding: 20px;
   color: #0a3d3d;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  animation: slideUp 0.25s ease;
-  text-align: left;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
-.subscribe-btn {
-  width: 100%;
-}
-
+.subscribe-btn,
 .close-btn {
   width: 100%;
   padding: 12px;
   margin-top: 15px;
   border-radius: 10px;
   border: none;
-  background: #ccc;
-  color: #222;
+  font-size: 1rem;
+}
+
+.subscribe-btn {
+  background: #14a1a1;
+  color: white;
+  cursor: pointer;
+}
+
+.close-btn {
+  background: #e2e8f0;
+  color: #1e293b;
+  cursor: pointer;
 }
 
 /* ------------------------------------------
-   DARK MODE
+   DARK MODE SUPPORT
 ------------------------------------------- */
-@media (prefers-color-scheme: dark) {
+body.dark-mode {
+  background: #0f172a;
+  color: #e7f5f5;
+}
 
-  body {
-    background: #0f1b26;
-    color: #e7f5f5;
-  }
+body.dark-mode .header {
+  background: #020617;
+}
 
-  .header {
-    background: #10242f;
-  }
+body.dark-mode #nani-chat-box {
+  background: #020617;
+  border-color: #1e293b;
+}
 
-  .title {
-    color: #9fe8e8;
-  }
+body.dark-mode .msg-user .bubble {
+  background: #1f2933;
+  color: #e5f4f9;
+}
 
-  .subtitle {
-    color: #88caca;
-  }
+body.dark-mode .msg-nani .bubble {
+  background: #253645;
+  color: #e7f5ff;
+}
 
-  #nani-chat-box {
-    background: #13222e;
-    border-color: #204458;
-  }
-
-  .msg-user .bubble {
-    background: #1e3a4a;
-    color: #dceff0;
-  }
-
-  .msg-nani .bubble {
-    background: #26485d;
-    color: #e8fbfb;
-  }
-
-  #nani-input {
-    background: #10202c;
-    color: #e8fbfb;
-    border: 1px solid #35596b;
-  }
-
-  button {
-    background: #158b8b;
-  }
-
-  .panel-content {
-    background: #14303f;
-    color: #e7f5f5;
-  }
+body.dark-mode #nani-input {
+  background: #020617;
+  color: #e7f5f5;
+  border-color: #1f2933;
 }
 
 /* ------------------------------------------
-   ANIMATIONS
+   SEASONAL CLASSES (LIGHT MODE ONLY)
 ------------------------------------------- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+body.winter {
+  background: #f0f7ff;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+body.spring {
+  background: #f0fdf4;
+}
+
+body.summer {
+  background: #fffbea;
+}
+
+body.fall {
+  background: #fef6e4;
 }
