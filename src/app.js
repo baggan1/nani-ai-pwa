@@ -210,80 +210,85 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendToNani();
   });
 
-  // -------------------------
-  // ACCOUNT PANEL
-  // -------------------------
-  async function openAccountPanel() {
-    // Ensure we know which email we're using
-    if (!userEmail) {
-      const { data } = await sb.auth.getSession();
-      if (data?.session?.user?.email) {
-        userEmail = data.session.user.email;
-        localStorage.setItem("nani_user_email", userEmail);
-      }
-    }
+// ----------------------------
+// ACCOUNT PANEL UI
+// ----------------------------
+const accountBtn = document.getElementById("account-btn");
+const accountPanel = document.getElementById("account-panel");
 
-    if (!userEmail) {
-      accEmail.textContent = "Not signed in";
-      accTrialStatus.textContent = "—";
-      accDaysLeft.textContent = "—";
-      accSubStatus.textContent = "—";
-      accSubscribeBtn.classList.add("hidden");
-      accountPanel.classList.remove("hidden");
-      return;
-    }
+const accEmail = document.getElementById("acc-email");
+const accTrialStatus = document.getElementById("acc-trial-status");
+const accDaysLeft = document.getElementById("acc-days-left");
+const accSubStatus = document.getElementById("acc-sub-status");
+const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
+const accCloseBtn = document.getElementById("acc-close");
 
-    try:
-      const res = await fetch(
-        `https://naturopathy.onrender.com/auth/status?email=${encodeURIComponent(userEmail)}`,
-        {
-          headers: {
-            "X-API-KEY": API_SECRET,
-          },
-        }
-      );
+// Open account panel
+accountBtn.addEventListener("click", async () => {
+  const email = localStorage.getItem("nani_user_email");  // ✅ correct key
 
-      const data = await res.json();
-
-      accEmail.textContent = userEmail;
-
-      if (data.error === "no-profile") {
-        accTrialStatus.textContent = "No profile found";
-        accDaysLeft.textContent = "—";
-        accSubStatus.textContent = "Not Subscribed";
-        accSubscribeBtn.classList.remove("hidden");
-      } else {
-        accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
-        accDaysLeft.textContent =
-          typeof data.days_left === "number" ? `${data.days_left}` : "—";
-        accSubStatus.textContent = data.subscribed
-          ? "Active Subscriber"
-          : "Not Subscribed";
-
-        if (!data.subscribed) {
-          accSubscribeBtn.classList.remove("hidden");
-        } else {
-          accSubscribeBtn.classList.add("hidden");
-        }
-      }
-    } catch (e) {
-      console.error("auth/status error:", e);
-      accTrialStatus.textContent = "Could not load status.";
-      accDaysLeft.textContent = "—";
-      accSubStatus.textContent = "—";
-    }
-
+  if (!email) {
+    accEmail.textContent = "Not signed in";
+    accTrialStatus.textContent = "—";
+    accDaysLeft.textContent = "—";
+    accSubStatus.textContent = "—";
+    accSubscribeBtn.classList.remove("hidden");
     accountPanel.classList.remove("hidden");
+    return;
   }
 
-  accountBtn.addEventListener("click", openAccountPanel);
+  try {
+    const res = await fetch(
+      `https://naturopathy.onrender.com/auth/status?email=${encodeURIComponent(email)}`,
+      {
+        headers: {
+          "X-API-KEY": import.meta.env.VITE_API_SECRET,
+        },
+      }
+    );
 
-  accCloseBtn.addEventListener("click", () => {
-    accountPanel.classList.add("hidden");
-  });
+    const data = await res.json();
 
-  accSubscribeBtn.addEventListener("click", () => {
-    // For now, just redirect to a placeholder subscription page or Stripe Checkout
-    window.location.href = "/subscribe";
-  });
+    accEmail.textContent = email;
+
+    if (data.error === "no-profile") {
+      accTrialStatus.textContent = "Not started";
+      accDaysLeft.textContent = "—";
+      accSubStatus.textContent = "Not Subscribed";
+      accSubscribeBtn.classList.remove("hidden");
+    } else {
+      accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
+
+      accDaysLeft.textContent =
+        typeof data.days_left === "number" ? data.days_left : "—";
+
+      accSubStatus.textContent = data.subscribed
+        ? "Active Subscriber"
+        : "Not Subscribed";
+
+      if (!data.subscribed) {
+        accSubscribeBtn.classList.remove("hidden");
+      } else {
+        accSubscribeBtn.classList.add("hidden");
+      }
+    }
+  } catch (e) {
+    console.error("auth/status error:", e);
+    accTrialStatus.textContent = "Could not load status.";
+    accDaysLeft.textContent = "—";
+    accSubStatus.textContent = "—";
+  }
+
+  accountPanel.classList.remove("hidden");
 });
+
+// Close panel
+accCloseBtn.addEventListener("click", () => {
+  accountPanel.classList.add("hidden");
+});
+
+// Subscribe button
+accSubscribeBtn.addEventListener("click", () => {
+  window.location.href = "/subscribe"; // or Stripe checkout link
+});
+
