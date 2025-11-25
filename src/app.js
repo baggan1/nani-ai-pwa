@@ -1,172 +1,129 @@
 /***************************************************
- * NANI-AI PWA — Supabase Auth + Trial Gating
- * - Magic link sign-in
- * - Auto session restore
- * - Trial / subscription status display
- * - Secure calls to backend with X-API-KEY
+ * NANI-AI PWA — Auth + Free Trial Edition
+ * - Supabase Auth (magic link + Google)
+ * - Email storage
+ * - Chat API calls
+ * - Account panel
+ * - Seasonal + dark mode themes
  ***************************************************/
 
 document.addEventListener("DOMContentLoaded", () => {
-  // -------------------------
-  // ENV (Vite → Vercel)
-  // -------------------------
+
+  // -----------------------------------------
+  // ENV VARIABLES (Vercel → Vite)
+  // -----------------------------------------
   const API_SECRET = import.meta.env.VITE_API_SECRET;
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-  // Supabase client (global from CDN)
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // -------------------------
-  // DOM Elements
-  // -------------------------
+  // -----------------------------------------
+  // DOM ELEMENTS
+  // -----------------------------------------
   const welcomeScreen = document.getElementById("welcome-screen");
-  const chatApp       = document.getElementById("chat-app");
+  const chatApp = document.getElementById("chat-app");
 
-  const emailInput    = document.getElementById("trial-email");
-  const sendLinkBtn   = document.getElementById("start-trial-btn");
-  const trialError    = document.getElementById("trial-error");
-  const trialNote     = document.getElementById("trial-note");
+  const trialEmailInput = document.getElementById("trial-email");
+  const startTrialBtn = document.getElementById("start-trial-btn");
+  const trialError = document.getElementById("trial-error");
 
-  const chatBox       = document.getElementById("nani-chat-box");
-  const inputField    = document.getElementById("nani-input");
-  const sendBtn       = document.getElementById("nani-send-btn");
-  const loader        = document.getElementById("nani-loader");
+  const chatBox = document.getElementById("nani-chat-box");
+  const inputField = document.getElementById("nani-input");
+  const sendBtn = document.getElementById("nani-send-btn");
+  const loader = document.getElementById("nani-loader");
 
-  const accountBtn      = document.getElementById("account-btn");
-  const accountPanel    = document.getElementById("account-panel");
-  const accEmail        = document.getElementById("acc-email");
-  const accTrialStatus  = document.getElementById("acc-trial-status");
-  const accDaysLeft     = document.getElementById("acc-days-left");
-  const accSubStatus    = document.getElementById("acc-sub-status");
+  // Account panel UI
+  const accountBtn = document.getElementById("account-btn");
+  const accountPanel = document.getElementById("account-panel");
+  const accEmail = document.getElementById("acc-email");
+  const accTrialStatus = document.getElementById("acc-trial-status");
+  const accDaysLeft = document.getElementById("acc-days-left");
+  const accSubStatus = document.getElementById("acc-sub-status");
   const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
-  const accCloseBtn     = document.getElementById("acc-close");
+  const accCloseBtn = document.getElementById("acc-close");
 
-  let userEmail = localStorage.getItem("nani_user_email") || null;
+  // -----------------------------------------
+  // SESSION HANDLING
+  // -----------------------------------------
+  let userEmail =
+    localStorage.getItem("nani_user_email") || null;
 
-  // -------------------------
-  // THEME (Dark + Seasonal)
-  // -------------------------
-  function applyTheme() {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.body.classList.add("dark-mode");
-      return;
-    }
+  // If authenticated via Supabase Auth → auto-fill email
+  async function loadSupabaseSession() {
+    const { data } = await sb.auth.getSession();
+    const email = data?.session?.user?.email;
 
-    const m = new Date().getMonth();
-    if (m === 11 || m <= 1)      document.body.classList.add("winter");
-    else if (m >= 2 && m <= 4)   document.body.classList.add("spring");
-    else if (m >= 5 && m <= 7)   document.body.classList.add("summer");
-    else                         document.body.classList.add("fall");
-  }
-
-  applyTheme();
-
-  // -------------------------
-  // AUTH: Restore Session
-  // -------------------------
-  async function restoreSession() {
-    try {
-      const { data, error } = await sb.auth.getSession();
-      if (error) {
-        console.warn("Session restore error:", error.message);
-        return;
-      }
-
-      const session = data?.session;
-      if (session?.user?.email) {
-        userEmail = session.user.email;
-        localStorage.setItem("nani_user_email", userEmail);
-        welcomeScreen.style.display = "none";
-        chatApp.style.display = "block";
-      } else {
-        // Not logged in
-        welcomeScreen.style.display = "block";
-        chatApp.style.display = "none";
-      }
-    } catch (e) {
-      console.error("restoreSession exception:", e);
+    if (email) {
+      userEmail = email;
+      localStorage.setItem("nani_user_email", email);
+      welcomeScreen.style.display = "none";
+      chatApp.style.display = "block";
     }
   }
 
-  restoreSession();
+  loadSupabaseSession();
 
-  // -------------------------
-  // AUTH: Send Magic Link
-  // -------------------------
-  async function sendMagicLink() {
-    const email = emailInput.value.trim();
+  // If localStorage has email → skip welcome page
+  if (userEmail) {
+    welcomeScreen.style.display = "none";
+    chatApp.style.display = "block";
+  }
 
-    trialError.textContent = "";
-    trialNote.textContent = "";
+  // -----------------------------------------
+  // START TRIAL (Signup via magic link)
+  // -----------------------------------------
+  startTrialBtn.addEventListener("click", async () => {
+    const email = trialEmailInput.value.trim();
 
-    if (!email || !email.includes("@")) {
-      trialError.textContent = "Please enter a valid email address.";
+    if (!email.includes("@")) {
+      alert("Please enter a valid email address.");
       return;
     }
 
-    sendLinkBtn.disabled = true;
-    sendLinkBtn.textContent = "Sending link...";
-
     try {
-      const { data, error } = await sb.auth.signInWithOtp({
+      const { error } = await sb.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin, // https://nani-ai-pwa.vercel.app
-        },
+          emailRedirectTo: window.location.origin,
+        }
       });
 
       if (error) {
-        console.error("Magic link error:", error.message);
-        trialError.textContent = error.message || "Could not send magic link.";
-      } else {
-        trialNote.textContent = "Magic link sent! Please check your email to continue.";
+        alert("Error sending magic link: " + error.message);
+        return;
       }
+
+      alert("A magic link has been sent to your email. Please check.");
     } catch (e) {
-      console.error("Magic link exception:", e);
-      trialError.textContent = "Something went wrong. Please try again.";
-    } finally {
-      sendLinkBtn.disabled = false;
-      sendLinkBtn.textContent = "Send Magic Link";
+      alert("Network error. Try again.");
     }
-  }
+  });
 
-  sendLinkBtn.addEventListener("click", sendMagicLink);
-
-  // -------------------------
-  // Chat UI: Append Messages
-  // -------------------------
+  // -----------------------------------------
+  // MESSAGES
+  // -----------------------------------------
   function appendMessage(sender, text) {
     const wrapper = document.createElement("div");
     wrapper.className = sender === "user" ? "msg-user" : "msg-nani";
 
     wrapper.innerHTML = `
-      <div class="bubble">
-        ${text.replace(/\n/g, "<br>")}
-      </div>
+      <div class="bubble">${text.replace(/\n/g, "<br>")}</div>
     `;
+
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // -------------------------
-  // Chat: Send Query
-  // -------------------------
+  // -----------------------------------------
+  // SEND QUERY TO BACKEND
+  // -----------------------------------------
   async function sendToNani() {
     const query = inputField.value.trim();
     if (!query) return;
 
-    // Ensure we still have user email
     if (!userEmail) {
-      const { data } = await sb.auth.getSession();
-      if (data?.session?.user?.email) {
-        userEmail = data.session.user.email;
-        localStorage.setItem("nani_user_email", userEmail);
-      }
-    }
-
-    if (!userEmail) {
-      appendMessage("nani", "Please sign in with your email first to start your trial.");
+      appendMessage("nani", "⚠️ Please sign in first.");
       return;
     }
 
@@ -175,19 +132,32 @@ document.addEventListener("DOMContentLoaded", () => {
     loader.style.display = "block";
 
     try {
-      const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": API_SECRET,
-        },
-        body: JSON.stringify({
-          email: userEmail,
-          query,
-          match_threshold: 0.4,
-          match_count: 3,
-        }),
-      });
+      const { data: sessionObj } = await sb.auth.getSession();
+      const jwt = sessionObj?.session?.access_token;
+
+      if (!jwt) {
+        loader.style.display = "none";
+        appendMessage("nani", "⚠️ Session expired. Please log in again.");
+        return;
+      }
+
+      const res = await fetch(
+        "https://naturopathy.onrender.com/fetch_naturopathy_results",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}`,
+            "X-API-KEY": API_SECRET
+          },
+          body: JSON.stringify({
+            email: userEmail,
+            query,
+            match_threshold: 0.4,
+            match_count: 3
+          })
+        }
+      );
 
       const data = await res.json();
       loader.style.display = "none";
@@ -197,11 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      appendMessage("nani", data.summary || "No remedy suggestions available.");
+      appendMessage("nani", data.summary);
+
     } catch (err) {
       loader.style.display = "none";
-      console.error("API error:", err);
-      appendMessage("nani", "⚠️ Network error. Please try again.");
+      appendMessage("nani", "⚠️ Network error.");
     }
   }
 
@@ -210,58 +180,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendToNani();
   });
 
-// ----------------------------
-// ACCOUNT PANEL UI
-// ----------------------------
-const accountBtn = document.getElementById("account-btn");
-const accountPanel = document.getElementById("account-panel");
+  // -----------------------------------------
+  // ACCOUNT PANEL
+  // -----------------------------------------
+  accountBtn.addEventListener("click", async () => {
+    const email = localStorage.getItem("nani_user_email");
 
-const accEmail = document.getElementById("acc-email");
-const accTrialStatus = document.getElementById("acc-trial-status");
-const accDaysLeft = document.getElementById("acc-days-left");
-const accSubStatus = document.getElementById("acc-sub-status");
-const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
-const accCloseBtn = document.getElementById("acc-close");
-
-// Open account panel
-accountBtn.addEventListener("click", async () => {
-  const email = localStorage.getItem("nani_user_email");  // ✅ correct key
-
-  if (!email) {
-    accEmail.textContent = "Not signed in";
-    accTrialStatus.textContent = "—";
-    accDaysLeft.textContent = "—";
-    accSubStatus.textContent = "—";
-    accSubscribeBtn.classList.remove("hidden");
-    accountPanel.classList.remove("hidden");
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      `https://naturopathy.onrender.com/auth/status?email=${encodeURIComponent(email)}`,
-      {
-        headers: {
-          "X-API-KEY": import.meta.env.VITE_API_SECRET,
-        },
-      }
-    );
-
-    const data = await res.json();
-
-    accEmail.textContent = email;
-
-    if (data.error === "no-profile") {
-      accTrialStatus.textContent = "Not started";
+    if (!email) {
+      accEmail.textContent = "Not signed in";
+      accTrialStatus.textContent = "—";
       accDaysLeft.textContent = "—";
-      accSubStatus.textContent = "Not Subscribed";
+      accSubStatus.textContent = "—";
       accSubscribeBtn.classList.remove("hidden");
-    } else {
+      accountPanel.classList.remove("hidden");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://naturopathy.onrender.com/auth/status?email=${encodeURIComponent(email)}`,
+        { headers: { "X-API-KEY": API_SECRET } }
+      );
+
+      const data = await res.json();
+
+      accEmail.textContent = email;
       accTrialStatus.textContent = data.trial_active ? "Active" : "Expired";
-
       accDaysLeft.textContent =
-        typeof data.days_left === "number" ? data.days_left : "—";
-
+        typeof data.days_left === "number" ? data.days_left : "0";
       accSubStatus.textContent = data.subscribed
         ? "Active Subscriber"
         : "Not Subscribed";
@@ -271,24 +217,39 @@ accountBtn.addEventListener("click", async () => {
       } else {
         accSubscribeBtn.classList.add("hidden");
       }
+
+    } catch (e) {
+      accTrialStatus.textContent = "Error loading status.";
+      accDaysLeft.textContent = "—";
+      accSubStatus.textContent = "—";
     }
-  } catch (e) {
-    console.error("auth/status error:", e);
-    accTrialStatus.textContent = "Could not load status.";
-    accDaysLeft.textContent = "—";
-    accSubStatus.textContent = "—";
+
+    accountPanel.classList.remove("hidden");
+  });
+
+  accCloseBtn.addEventListener("click", () =>
+    accountPanel.classList.add("hidden")
+  );
+
+  accSubscribeBtn.addEventListener("click", () => {
+    window.location.href = "/subscribe";
+  });
+
+  // -----------------------------------------
+  // THEMING — Dark mode + Seasonal colors
+  // -----------------------------------------
+  function applyTheme() {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.body.classList.add("dark-mode");
+      return;
+    }
+
+    const m = new Date().getMonth();
+    if (m === 11 || m <= 1) document.body.classList.add("winter");
+    else if (m >= 2 && m <= 4) document.body.classList.add("spring");
+    else if (m >= 5 && m <= 7) document.body.classList.add("summer");
+    else document.body.classList.add("fall");
   }
 
-  accountPanel.classList.remove("hidden");
+  applyTheme();
 });
-
-// Close panel
-accCloseBtn.addEventListener("click", () => {
-  accountPanel.classList.add("hidden");
-});
-
-// Subscribe button
-accSubscribeBtn.addEventListener("click", () => {
-  window.location.href = "/subscribe"; // or Stripe checkout link
-});
-
