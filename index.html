@@ -12,34 +12,51 @@
 
   <link rel="stylesheet" href="/src/ui.css" />
 </head>
+
 <body>
-  <!-- 🌿 WELCOME / AUTH SCREEN -->
+
+  <!-- 🌿 WELCOME SCREEN (LOGIN) -->
   <div id="welcome-screen" class="welcome-screen">
-    <img src="/icons/nani-avatar.png" class="welcome-avatar" alt="Nani-AI Avatar" />
+
+    <img src="/icons/nani-avatar.png" class="welcome-avatar" />
 
     <h1 class="welcome-title">Welcome to Nani-AI</h1>
     <p class="welcome-subtitle">
-      Your natural wellness guide. Start with a 7-day free trial using your email.
+      Your natural wellness guide. Sign in to begin your free trial.
     </p>
 
-    <input id="trial-email" type="email" placeholder="Enter your email" />
-    <button id="start-trial-btn">Send Magic Link</button>
-    <div id="trial-error" class="error-msg"></div>
-    <p id="trial-note" class="welcome-note"></p>
+    <!-- Magic Link Login -->
+    <input id="login-email" type="email" placeholder="Enter your email" />
+    <button id="login-btn">Send Magic Link</button>
+    <div id="login-error" class="error-msg"></div>
+
+    <div class="divider">OR</div>
+
+    <!-- Google Login -->
+    <button id="google-login-btn" class="google-btn">
+      <img src="/icons/google-icon.png" /> Continue with Google
+    </button>
+
   </div>
 
-  <!-- 🌿 MAIN CHAT APP (Hidden until logged in) -->
-  <div id="chat-app" style="display: none;">
-    <header class="header">
+
+  <!-- 🌿 MAIN CHAT APP -->
+  <div id="chat-app" style="display:none;">
+
+    <!-- HEADER -->
+    <div class="header">
+
       <div class="header-content">
         <div class="avatar"></div>
         <div class="title">Nani-AI</div>
         <div class="subtitle">Your Natural Wellness Guide</div>
       </div>
-      <button id="account-btn" class="account-btn">Account</button>
-    </header>
 
-    <main class="container">
+      <button id="account-btn" class="account-btn">Account</button>
+    </div>
+
+    <!-- CHAT BODY -->
+    <div class="container">
       <div id="nani-chat-box"></div>
 
       <div class="input-row">
@@ -48,12 +65,20 @@
       </div>
 
       <div id="nani-loader" class="loader">🌱 Preparing Nani’s wisdom...</div>
-    </main>
+
+      <div id="trial-expired" class="expired-box hidden">
+        <h3>Your free trial has ended</h3>
+        <p>Subscribe to continue using Nani-AI.</p>
+        <button id="subscribe-btn">Subscribe</button>
+      </div>
+    </div>
   </div>
 
-  <!-- ACCOUNT PANEL MODAL -->
+
+  <!-- 🌿 ACCOUNT PANEL MODAL -->
   <div id="account-panel" class="account-panel hidden">
     <div class="panel-content">
+
       <h2>Your Account</h2>
 
       <p><strong>Email:</strong> <span id="acc-email">—</span></p>
@@ -61,14 +86,13 @@
       <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
       <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
 
-      <button id="acc-subscribe-btn" class="subscribe-btn hidden">
-        Subscribe
-      </button>
+      <button id="acc-subscribe-btn" class="subscribe-btn hidden">Subscribe</button>
       <button id="acc-close" class="close-btn">Close</button>
     </div>
   </div>
 
-  <!-- Supabase + Front-End App -->
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/app.js"></script>
 </body>

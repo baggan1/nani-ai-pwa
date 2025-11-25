@@ -1,12 +1,17 @@
+
 /* ------------------------------------------
-   GLOBAL APP LAYOUT
+   GLOBAL
 ------------------------------------------- */
 body {
   margin: 0;
   padding: 0;
   font-family: system-ui, sans-serif;
-  background: #f6fdfb; /* soft light green */
-  color: #0a3d3d;      /* dark teal */
+  background: #f6fdfb;
+  color: #0a3d3d;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .container {
@@ -15,8 +20,78 @@ body {
   padding: 20px;
 }
 
-.hidden {
-  display: none;
+/* ------------------------------------------
+   WELCOME SCREEN
+------------------------------------------- */
+.welcome-screen {
+  text-align: center;
+  padding: 50px 20px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.welcome-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.welcome-title {
+  font-size: 1.9rem;
+  font-weight: bold;
+  color: #0d8f8f;
+}
+
+.welcome-subtitle {
+  color: #116666;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#welcome-screen input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #bcdcdc;
+  margin-bottom: 12px;
+}
+
+#welcome-screen button {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #14A1A1;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+#login-btn:hover {
+  background: #0e7f7f;
+}
+
+.google-btn {
+  background: white !important;
+  border: 1px solid #ddd;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.google-btn img {
+  width: 18px;
+}
+
+.divider {
+  margin: 20px 0;
+  font-size: 0.9rem;
+  color: #888;
 }
 
 /* ------------------------------------------
@@ -24,50 +99,48 @@ body {
 ------------------------------------------- */
 .header {
   position: relative;
-  padding: 20px 15px;
   background: #f0fdfa;
+  padding: 25px 15px;
   text-align: center;
+  border-bottom: 1px solid #dceeee;
 }
 
 .header-content {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
 }
 
 .avatar {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-image: url("/icons/nani-avatar.png");
   background-size: cover;
-  background-position: center;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
 }
 
 .title {
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: bold;
   color: #0d8f8f;
 }
 
 .subtitle {
-  font-size: 0.95rem;
   color: #116666;
+  margin-top: 3px;
 }
 
-/* Account Button (top-right) */
 .account-btn {
   position: absolute;
   right: 15px;
-  top: 15px;
-  background: #14a1a1;
-  color: white;
-  border: none;
-  padding: 8px 12px;
+  top: 20px;
+  padding: 8px 14px;
   border-radius: 8px;
+  background: #14A1A1;
+  color: white;
   font-size: 0.9rem;
+  border: none;
   cursor: pointer;
 }
 
@@ -77,9 +150,9 @@ body {
 #nani-chat-box {
   height: 420px;
   overflow-y: auto;
-  background: #ffffff;
-  border: 1px solid #c7e7e7;
+  background: white;
   border-radius: 14px;
+  border: 1px solid #c7e7e7;
   padding: 14px;
   margin-bottom: 20px;
 }
@@ -87,26 +160,26 @@ body {
 /* ------------------------------------------
    CHAT BUBBLES
 ------------------------------------------- */
+.msg-user .bubble,
+.msg-nani .bubble {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}
+
 .msg-user .bubble {
   background: #d4f7e2;
   color: #0a3d3d;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  white-space: pre-wrap;
 }
 
 .msg-nani .bubble {
   background: #e3f8f8;
   color: #0a3d3d;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  white-space: pre-wrap;
 }
 
 /* ------------------------------------------
-   INPUT + BUTTON ROW
+   INPUT ROW
 ------------------------------------------- */
 .input-row {
   display: flex;
@@ -123,91 +196,26 @@ body {
 
 #nani-send-btn {
   padding: 12px 16px;
-  font-size: 1rem;
+  background: #14A1A1;
+  color: white;
   border-radius: 10px;
   border: none;
-  background: #14a1a1;
-  color: white;
-  cursor: pointer;
-}
-
-#nani-send-btn:hover {
-  background: #0e7f7f;
 }
 
 /* ------------------------------------------
-   LOADER
+   TRIAL EXPIRED BOX
 ------------------------------------------- */
-.loader,
-#nani-loader {
-  display: none;
-  margin-top: 14px;
+.expired-box {
+  background: #fff4d9;
+  border: 1px solid #ffe6b3;
+  padding: 15px;
+  border-radius: 12px;
   text-align: center;
-  color: #0d8f8f;
 }
 
-/* ------------------------------------------
-   WELCOME / AUTH SCREEN
-------------------------------------------- */
-.welcome-screen {
-  text-align: center;
-  padding: 40px 20px 20px;
-  max-width: 420px;
-  margin: 0 auto;
-}
-
-.welcome-avatar {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  margin-bottom: 15px;
-}
-
-.welcome-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #0d8f8f;
-  margin-bottom: 10px;
-}
-
-.welcome-subtitle {
-  font-size: 1rem;
-  color: #116666;
-  margin-bottom: 20px;
-  line-height: 1.45;
-}
-
-#welcome-screen input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-#welcome-screen button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border: none;
-  background: #14a1a1;
-  color: white;
-  border-radius: 8px;
-  font-size: 1.05rem;
-  cursor: pointer;
-}
-
-.error-msg {
-  color: #b91c1c;
-  font-size: 0.9rem;
-  margin-top: 6px;
-}
-
-.welcome-note {
-  font-size: 0.9rem;
-  color: #0f766e;
-  margin-top: 10px;
+.expired-box h3 {
+  margin: 0 0 10px;
+  color: #c07a00;
 }
 
 /* ------------------------------------------
@@ -215,30 +223,23 @@ body {
 ------------------------------------------- */
 .account-panel {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
   backdrop-filter: blur(6px);
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0,0,0,0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
-}
-
-.account-panel.hidden {
-  display: none;
 }
 
 .panel-content {
   background: white;
-  width: 85%;
+  width: 90%;
   max-width: 380px;
   border-radius: 14px;
   padding: 20px;
   color: #0a3d3d;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .subscribe-btn,
@@ -248,69 +249,30 @@ body {
   margin-top: 15px;
   border-radius: 10px;
   border: none;
-  font-size: 1rem;
 }
 
 .subscribe-btn {
-  background: #14a1a1;
+  background: #14A1A1;
   color: white;
-  cursor: pointer;
 }
 
 .close-btn {
-  background: #e2e8f0;
-  color: #1e293b;
-  cursor: pointer;
+  background: #ddd;
+  color: #333;
 }
 
 /* ------------------------------------------
-   DARK MODE SUPPORT
+   DARK MODE
 ------------------------------------------- */
-body.dark-mode {
-  background: #0f172a;
-  color: #e7f5f5;
-}
+@media (prefers-color-scheme: dark) {
+  body { background: #0f1b26; color: #e7f5f5; }
 
-body.dark-mode .header {
-  background: #020617;
-}
+  .header { background: #14212e; }
+  #nani-chat-box { background: #13222e; border-color: #204458; }
 
-body.dark-mode #nani-chat-box {
-  background: #020617;
-  border-color: #1e293b;
-}
+  .msg-user .bubble { background: #1e3a4a; color: #dceff0; }
+  .msg-nani .bubble { background: #26485d; color: #e8fbfb; }
 
-body.dark-mode .msg-user .bubble {
-  background: #1f2933;
-  color: #e5f4f9;
-}
-
-body.dark-mode .msg-nani .bubble {
-  background: #253645;
-  color: #e7f5ff;
-}
-
-body.dark-mode #nani-input {
-  background: #020617;
-  color: #e7f5f5;
-  border-color: #1f2933;
-}
-
-/* ------------------------------------------
-   SEASONAL CLASSES (LIGHT MODE ONLY)
-------------------------------------------- */
-body.winter {
-  background: #f0f7ff;
-}
-
-body.spring {
-  background: #f0fdf4;
-}
-
-body.summer {
-  background: #fffbea;
-}
-
-body.fall {
-  background: #fef6e4;
+  #nani-input { background: #10202c; color: #e8fbfb; }
+  #nani-send-btn { background: #158b8b; }
 }
