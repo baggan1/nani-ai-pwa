@@ -84,9 +84,29 @@ body {
   justify-content: center;
 }
 
-.google-btn img {
-  width: 18px;
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
 }
+
+.google-btn:hover {
+  background: #f1f1f1;
+}
+
+.google-icon svg {
+  display: block;
+}
+
 
 .divider {
   margin: 20px 0;
