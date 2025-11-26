@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let session = null;
   let accessToken = null;
   let userEmail = null;
+  let typingBubble = null;
 
   // -----------------------------------------------
   // HELPERS
@@ -70,6 +71,29 @@ document.addEventListener("DOMContentLoaded", () => {
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
+
+	function showTyping() {
+	typingBubble = document.createElement("div");
+	typingBubble.className = "msg-nani";
+
+	typingBubble.innerHTML = `
+		<div class="typing-indicator">
+		<div class="typing-dots">
+			<div></div><div></div><div></div>
+		</div>
+		</div>
+	`;
+
+	chatBox.appendChild(typingBubble);
+	chatBox.scrollTop = chatBox.scrollHeight;
+	}
+
+	function hideTyping() {
+	if (typingBubble) {
+		typingBubble.remove();
+		typingBubble = null;
+	}
+	}
 
   // -----------------------------------------------
   // INIT SESSION
@@ -163,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     appendMessage("user", query);
     inputField.value = "";
-    loader.style.display = "block";
+    showTyping();
 
     try {
       const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
@@ -181,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await res.json();
-      loader.style.display = "none";
+      hideTyping();
 
       if (data.error) {
         appendMessage("nani", "⚠️ " + data.error);
@@ -191,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
       appendMessage("nani", data.summary);
 
     } catch (err) {
-      loader.style.display = "none";
+      hideTyping();
       appendMessage("nani", "⚠️ Network error. Try again.");
     }
   }
