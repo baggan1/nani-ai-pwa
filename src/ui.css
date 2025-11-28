@@ -306,11 +306,43 @@ body {
 .subscribe-btn {
   background: #14A1A1;
   color: white;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.subscribe-btn:hover {
+  background: #0f8080;
 }
 
 .close-btn {
   background: #ddd;
   color: #333;
+}
+
+/* ------------------------------------------
+   UPGRADE BANNER
+------------------------------------------- */
+.upgrade-banner {
+  background: #e4faf5;
+  border: 1px solid #b6e3d9;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  text-align: center;
+  color: #0c6b6b;
+  font-size: 0.95rem;
+}
+
+.upgrade-banner span {
+  font-weight: bold;
+  cursor: pointer;
+  color: #0d8f8f;
+  text-decoration: underline;
+}
+
+.upgrade-banner span:hover {
+  color: #0a5353;
 }
 
 /* ------------------------------------------
