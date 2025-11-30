@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const { error } = await sb.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: "https://nani-ai-pwa.vercel.app" }
+        options: { emailRedirectTo: window.location.origin }
       });
 
       if (error) alert("Error: " + error.message);
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await sb.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: "https://nani-ai-pwa.vercel.app" },
+        options: { redirectTo: window.location.origin },
       });
     } catch {
       alert("Google login failed.");
