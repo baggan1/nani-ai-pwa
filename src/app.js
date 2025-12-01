@@ -36,11 +36,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const accSubStatus = document.getElementById("acc-sub-status");
   const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
   const accCloseBtn = document.getElementById("acc-close");
+  const accLogoutBtn = document.getElementById("acc-logout-btn");
 
   const upgradeBanner = document.getElementById("upgrade-banner");
   const upgradeLink = document.getElementById("upgrade-link");
   
+  const accRoleBadge = document.getElementById("acc-role-badge");
+  const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
+  const accUpgradeAnnual = document.getElementById("acc-upgrade-annual");
   const manageBillingBtn = document.getElementById("manage-billing-btn");
+  const historyToggleBtn = document.getElementById("history-toggle-btn");
+  const historyPanel = document.getElementById("history-panel");
+  const historyList = document.getElementById("history-list");
+  const historyEmpty = document.getElementById("history-empty");
+  const accLogoutBtn = document.getElementById("acc-logout-btn");
+  const trialExpiredBox = document.getElementById("trial-expired");
+  const upgradeBanner = document.getElementById("upgrade-banner"); // if you have a soft banner
+
+  const STRIPE_MONTHLY_PRICE_ID = "price_monthly_here";
+  const STRIPE_ANNUAL_PRICE_ID = "price_annual_here";
 
 
   // -----------------------------------------------
@@ -89,6 +103,59 @@ document.addEventListener("DOMContentLoaded", () => {
       typingBubble = null;
     }
   }
+
+  function setRoleBadge(role) {
+   accRoleBadge.classList.remove("premium", "trial", "free");
+
+   if (role === "premium") {
+     accRoleBadge.textContent = "Premium";
+     accRoleBadge.classList.add("premium");
+   } else if (role === "trial") {
+     accRoleBadge.textContent = "Trial";
+     accRoleBadge.classList.add("trial");
+   } else {
+     accRoleBadge.textContent = "Free";
+     accRoleBadge.classList.add("free");
+   }
+ }
+
+// info comes from /auth/status
+ function updateSubscriptionUI(info) {
+   const { trial_active, days_left, subscribed, role } = info;
+
+   setRoleBadge(role || (subscribed ? "premium" : trial_active ? "trial" : "free"));
+
+   accTrialStatus.textContent = trial_active ? "Active" : "Expired";
+   accDaysLeft.textContent = trial_active ? `${days_left}` : "0";
+   accSubStatus.textContent = subscribed ? "Active Premium" : (trial_active ? "Free Trial" : "Free");
+
+   // Upgrade / Billing button visibility
+   if (subscribed) {
+    // Premium
+     accUpgradeMonthly.classList.add("hidden");
+     accUpgradeAnnual.classList.add("hidden");
+     manageBillingBtn.classList.remove("hidden");
+     if (upgradeBanner) upgradeBanner.classList.add("hidden");
+     if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
+   } else {
+    // Not subscribed
+     manageBillingBtn.classList.add("hidden");
+     accUpgradeMonthly.classList.remove("hidden");
+     accUpgradeAnnual.classList.remove("hidden");
+
+     if (trial_active) {
+       // Trial user → allow app but prompt with soft upsell
+       if (upgradeBanner) upgradeBanner.classList.remove("hidden");
+       if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
+     } else {
+       // Free (no trial) → show hard gate if you want
+       if (trialExpiredBox) trialExpiredBox.classList.remove("hidden");
+       if (upgradeBanner) upgradeBanner.classList.add("hidden");
+     }
+   }
+ }
+
+
 
   // ------------------------------------------------
   // LEARN SESSION IF ALREADY LOGGED IN
@@ -173,43 +240,41 @@ document.addEventListener("DOMContentLoaded", () => {
   // ------------------------------------------------
   // STRIPE: Start checkout
   // ------------------------------------------------
- async function startCheckout() {
-  const { data: { user } } = await sb.auth.getUser();
+ async function startCheckout(priceId) {
+	const { data: { user } } = await sb.auth.getUser();
+	if (!user) {
+		alert("Please sign in again.");
+		return;
+	}
 
-  if (!user) {
-    alert("Please sign in again.");
-    return;
+	const email = user.email;
+	const userId = user.id;
+
+	if (!priceId) {
+		// default to monthly if none passed
+		priceId = STRIPE_MONTHLY_PRICE_ID;
+	}
+
+	const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+		method: "POST",
+		headers: {
+		"Content-Type": "application/json",
+		"X-API-KEY": API_SECRET
+		},
+		body: JSON.stringify({
+		price_id: priceId,
+		email: email,
+		user_id: userId
+		})
+	});
+
+	const data = await res.json();
+	if (data.checkout_url) {
+		window.location.href = data.checkout_url;
+	} else {
+		alert("Checkout error. Try again.");
+	}
   }
-
-  const email = user.email;
-  const user_id = user.id;
-
-  if (!email || !user_id) {
-    alert("Missing user information. Please re-login.");
-    return;
-  }
-
-  const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-KEY": API_SECRET
-    },
-    body: JSON.stringify({
-      price_id: "price_1SWMZ5HrqVgKycWRnBd7IGOU",
-      email,
-      user_id
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.checkout_url) {
-    window.location.href = data.checkout_url;
-  } else {
-    alert("Checkout error: " + (data.detail || "Try again."));
-  }
- }
 
 
   // ------------------------------------------------
@@ -275,11 +340,26 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Stripe checkout from account panel
-  accSubscribeBtn.addEventListener("click", startCheckout);
+  //accSubscribeBtn.addEventListener("click", startCheckout);
+  
+  accUpgradeMonthly.addEventListener("click", () => {
+  startCheckout(STRIPE_MONTHLY_PRICE_ID);
+  });
+
+  accUpgradeAnnual.addEventListener("click", () => {
+  startCheckout(STRIPE_ANNUAL_PRICE_ID);
+  });
 
   // Stripe checkout from banner
-  if (upgradeLink) {
+  /*if (upgradeLink) {
     upgradeLink.addEventListener("click", startCheckout);
+  }*/
+  
+  if (accSubscribeBtn) {
+  accSubscribeBtn.addEventListener("click", () => startCheckout(STRIPE_MONTHLY_PRICE_ID));
+  }
+  if (upgradeLink) {
+  upgradeLink.addEventListener("click", () => startCheckout(STRIPE_MONTHLY_PRICE_ID));
   }
 
 //Manage Billing Button
@@ -307,6 +387,87 @@ document.addEventListener("DOMContentLoaded", () => {
 		alert("Unable to open billing portal.");
 	}
   });
+//User Account Logout Button
+  accLogoutBtn.addEventListener("click", async () => {
+	await sb.auth.signOut();
+	localStorage.clear();
+	window.location.href = "/"; // Redirects to login screen
+  });
+
+ //-------------------------------------
+ //History Toggle +fetch ---------------
+ //-------------------------------------
+let historyLoaded = false;
+
+historyToggleBtn.addEventListener("click", async () => {
+  if (historyPanel.classList.contains("hidden")) {
+    historyPanel.classList.remove("hidden");
+    historyToggleBtn.textContent = "Hide Wellness History";
+    if (!historyLoaded) {
+      await loadHistory();
+      historyLoaded = true;
+    }
+  } else {
+    historyPanel.classList.add("hidden");
+    historyToggleBtn.textContent = "View Wellness History";
+  }
+});
+
+async function loadHistory() {
+  if (!accessToken) {
+    historyEmpty.classList.remove("hidden");
+    historyEmpty.textContent = "Please sign in to view your history.";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://naturopathy.onrender.com/user/history", {
+      headers: {
+        "X-API-KEY": API_SECRET,
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    const data = await res.json();
+
+    historyList.innerHTML = "";
+    if (!Array.isArray(data) || data.length === 0) {
+      historyEmpty.classList.remove("hidden");
+      return;
+    }
+
+    historyEmpty.classList.add("hidden");
+
+    data.forEach(item => {
+      const li = document.createElement("li");
+      const dt = new Date(item.created_at || item.createdAt || Date.now());
+      const timeStr = dt.toLocaleString();
+      li.textContent = `${item.query}  —  ${timeStr}`;
+      historyList.appendChild(li);
+    });
+  } catch (err) {
+    console.error("History load error", err);
+    historyEmpty.classList.remove("hidden");
+    historyEmpty.textContent = "Could not load history.";
+  }
+}
+
+//-----------------------------------------------
+//SIGN-OUT----------------------------------------
+//------------------------------------------------
+accLogoutBtn.addEventListener("click", async () => {
+  try {
+    await sb.auth.signOut();
+  } catch (e) {
+    console.error("Logout error", e);
+  }
+  localStorage.removeItem("nani_access_token");
+  localStorage.removeItem("nani_user_email");
+  accessToken = null;
+  userEmail = null;
+  showScreen(false);      // back to welcome screen
+  accountPanel.classList.add("hidden");
+});
 
   // -----------------------------------------------
   // FETCH RESULTS / SEND CHAT MESSAGE

@@ -303,13 +303,13 @@ body {
   border: none;
 }
 
-.subscribe-btn {
+/*.subscribe-btn {
   background: #14A1A1;
   color: white;
   font-size: 1rem;
   border: none;
   cursor: pointer;
-}
+}*/
 
 .subscribe-btn:hover {
   background: #0f8080;
@@ -318,6 +318,20 @@ body {
 .close-btn {
   background: #ddd;
   color: #333;
+}
+
+.logout-btn {
+  background: #c94a4a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: #a83c3c;
 }
 
 /* ------------------------------------------
@@ -344,6 +358,102 @@ body {
 .upgrade-banner span:hover {
   color: #0a5353;
 }
+
+.role-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #e0f7f7;
+  color: #0d8f8f;
+  text-transform: uppercase;
+}
+
+.role-badge.premium {
+  background: #ffe9b3;
+  color: #b87400;
+}
+
+.role-badge.trial {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.role-badge.free {
+  background: #e0e0e0;
+  color: #424242;
+}
+
+.subscribe-btn.outline {
+  background: white;
+  color: #14A1A1;
+  border: 1px solid #14A1A1;
+}
+
+.history-toggle {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cde4e4;
+  background: #f5fbfb;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.history-panel {
+  margin-top: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #e1eeee;
+  padding: 8px 10px;
+  background: #ffffff;
+}
+
+.history-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.history-list li {
+  font-size: 0.9rem;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef4f4;
+}
+
+.history-list li:last-child {
+  border-bottom: none;
+}
+
+.history-empty {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #c94a4a;
+  color: white;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #a83c3c;
+}
+
 
 /* ------------------------------------------
    DARK MODE

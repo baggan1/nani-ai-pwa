@@ -86,22 +86,54 @@
 
 
   <!-- 🌿 ACCOUNT PANEL MODAL -->
-  <div id="account-panel" class="account-panel hidden">
-    <div class="panel-content">
+<!-- 🌿 ACCOUNT PANEL MODAL -->
+<div id="account-panel" class="account-panel hidden">
+  <div class="panel-content">
 
-      <h2>Your Account</h2>
+    <h2>Your Account</h2>
 
-      <p><strong>Email:</strong> <span id="acc-email">—</span></p>
-      <p><strong>Trial Status:</strong> <span id="acc-trial-status">—</span></p>
-      <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
-      <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
-
-      <button id="acc-subscribe-btn" class="subscribe-btn hidden">Unlock Nani-AI Premium</button>
-      <button id="acc-close" class="close-btn">Close</button>
-	  <button id="manage-billing-btn" class="subscribe-btn hidden">Manage Billing</button>
-
+    <!-- Role badge -->
+    <div class="role-row">
+      <span class="role-badge" id="acc-role-badge">Free</span>
     </div>
+
+    <p><strong>Email:</strong> <span id="acc-email">—</span></p>
+    <p><strong>Trial Status:</strong> <span id="acc-trial-status">—</span></p>
+    <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
+    <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
+
+    <!-- Upgrade options -->
+    <div id="acc-upgrade-block">
+      <p><strong>Upgrade to Nani-AI Premium:</strong></p>
+      <button id="acc-upgrade-monthly" class="subscribe-btn">
+        🌿 Monthly Plan
+      </button>
+      <button id="acc-upgrade-annual" class="subscribe-btn outline">
+        ✨ Annual Plan (Best Value)
+      </button>
+    </div>
+
+    <!-- Manage billing (only when subscribed) -->
+    <button id="manage-billing-btn" class="subscribe-btn hidden">
+      Manage Billing
+    </button>
+
+    <!-- History -->
+    <button id="history-toggle-btn" class="history-toggle">
+      View Wellness History
+    </button>
+    <div id="history-panel" class="history-panel hidden">
+      <p class="history-hint">Your last 25 wellness questions:</p>
+      <ul id="history-list" class="history-list"></ul>
+      <p id="history-empty" class="history-empty hidden">No history yet.</p>
+    </div>
+
+    <!-- Actions -->
+    <button id="acc-logout-btn" class="logout-btn">Sign Out</button>
+    <button id="acc-close" class="close-btn">Close</button>
   </div>
+</div>
+
 
 
   <!-- Scripts -->
