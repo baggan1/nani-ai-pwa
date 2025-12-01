@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nani-AI – Subscription Activated</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f6fdfb;
+      color: #0a3d3d;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .box {
+      background: white;
+      max-width: 480px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid #cce7e7;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      color: #0d8f8f;
+    }
+
+    p {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 20px;
+      background: #14A1A1;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-top: 18px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #0e7f7f;
+    }
+
+    .small {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: #116666;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h1>🎉 Subscription Activated</h1>
+    <p>Your Nani-AI Premium subscription is now active.  
+       You can now enjoy unlimited natural wellness guidance.</p>
+
+    <a href="https://nani.arkayoga.com" class="btn">Back to Nani-AI App</a>
+
+    <!-- Billing Portal Button -->
+    <button id="manageBilling" class="btn" style="margin-top: 14px; background:#0d8f8f;">
+      Manage Billing
+    </button>
+
+    <p class="small">Update card, view invoices, or cancel subscription anytime.</p>
+  </div>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+  const API_SECRET = import.meta.env.VITE_API_SECRET;
+
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  document.getElementById("manageBilling").addEventListener("click", async () => {
+    const { data: { user } } = await sb.auth.getUser();
+
+    if (!user) {
+      alert("Please log in again.");
+      window.location.href = "/";
+      return;
+    }
+
+    const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": API_SECRET
+      },
+      body: JSON.stringify({ user_id: user.id })
+    });
+
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert("Unable to open billing portal.");
+  });
+</script>
+
+</body>
+</html>
+
+
