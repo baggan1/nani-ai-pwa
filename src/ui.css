@@ -383,6 +383,7 @@ body {
   border: 1px solid #14A1A1;
 }
 
+/*
 .history-toggle {
   margin-top: 16px;
   width: 100%;
@@ -426,6 +427,7 @@ body {
   font-size: 0.9rem;
   color: #777;
 }
+*/
 
 .logout-btn {
   width: 100%;

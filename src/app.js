@@ -44,10 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
   const accUpgradeAnnual = document.getElementById("acc-upgrade-annual");
   const manageBillingBtn = document.getElementById("manage-billing-btn");
-  const historyToggleBtn = document.getElementById("history-toggle-btn");
-  const historyPanel = document.getElementById("history-panel");
-  const historyList = document.getElementById("history-list");
-  const historyEmpty = document.getElementById("history-empty");
+ // const historyToggleBtn = document.getElementById("history-toggle-btn");
+ // const historyPanel = document.getElementById("history-panel");
+ // const historyList = document.getElementById("history-list");
+ // const historyEmpty = document.getElementById("history-empty");
   const accLogoutBtn = document.getElementById("acc-logout-btn");
   const trialExpiredBox = document.getElementById("trial-expired");
 
@@ -361,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
  //-------------------------------------
  //History Toggle +fetch ---------------
  //-------------------------------------
-let historyLoaded = false;
+/*let historyLoaded = false;
 
 historyToggleBtn.addEventListener("click", async () => {
   if (historyPanel.classList.contains("hidden")) {
@@ -415,6 +415,7 @@ async function loadHistory() {
     historyEmpty.textContent = "Could not load history.";
   }
 }
+*/
 
 //-----------------------------------------------
 //SIGN-OUT----------------------------------------
