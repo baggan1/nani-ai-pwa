@@ -51,6 +51,7 @@ body {
 
 #welcome-screen input {
   width: 100%;
+  display: block;
   padding: 14px;
   border-radius: 10px;
   border: 1px solid #bcdcdc;
@@ -60,6 +61,7 @@ body {
 
 #welcome-screen button {
   width: 100%;
+  display: block;
   padding: 14px;
   font-size: 1rem;
   border-radius: 10px;
@@ -69,10 +71,6 @@ body {
   cursor: pointer;
   margin-bottom: 12px;
   box-sizing: border-box;
-}
-
-#login-btn:hover {
-  background: #0e7f7f;
 }
 
 .google-btn {
@@ -292,6 +290,7 @@ body {
   border-radius: 14px;
   padding: 20px;
   color: #0a3d3d;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
 }
 
 .subscribe-btn,
@@ -303,13 +302,13 @@ body {
   border: none;
 }
 
-/*.subscribe-btn {
+.subscribe-btn {
   background: #14A1A1;
   color: white;
   font-size: 1rem;
   border: none;
   cursor: pointer;
-}*/
+}
 
 .subscribe-btn:hover {
   background: #0f8080;
@@ -320,19 +319,6 @@ body {
   color: #333;
 }
 
-.logout-btn {
-  background: #c94a4a;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  width: 100%;
-  margin-top: 10px;
-  cursor: pointer;
-}
-.logout-btn:hover {
-  background: #a83c3c;
-}
 
 /* ------------------------------------------
    UPGRADE BANNER
@@ -416,6 +402,8 @@ body {
   border: 1px solid #e1eeee;
   padding: 8px 10px;
   background: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .history-list {
