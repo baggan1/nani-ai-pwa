@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "X-API-KEY": API_SECRET
       },
       body: JSON.stringify({
-        price_id: "price_1SWNgmQZiiSZQI7eU1dUbHez",  // YOUR STRIPE PRICE
+        price_id: "price_1SWMZ5HrqVgKycWRnBd7IGOU",  // YOUR STRIPE PRICE
         email: email,
         user_id: user.id
       })
