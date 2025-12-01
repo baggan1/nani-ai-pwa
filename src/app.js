@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const accSubStatus = document.getElementById("acc-sub-status");
   const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
   const accCloseBtn = document.getElementById("acc-close");
-  const accLogoutBtn = document.getElementById("acc-logout-btn");
 
   const upgradeBanner = document.getElementById("upgrade-banner");
   const upgradeLink = document.getElementById("upgrade-link");
@@ -51,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyEmpty = document.getElementById("history-empty");
   const accLogoutBtn = document.getElementById("acc-logout-btn");
   const trialExpiredBox = document.getElementById("trial-expired");
-  const upgradeBanner = document.getElementById("upgrade-banner"); // if you have a soft banner
 
   const STRIPE_MONTHLY_PRICE_ID = "price_monthly_here";
   const STRIPE_ANNUAL_PRICE_ID = "price_annual_here";
