@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const upgradeBanner = document.getElementById("upgrade-banner");
   const upgradeLink = document.getElementById("upgrade-link");
+  
+  const manageBillingBtn = document.getElementById("manage-billing-btn");
+
 
   // -----------------------------------------------
   // STATE
@@ -225,8 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       upgradeBanner.classList.add("hidden");
     }
-  }
-
+	
+	// Manage Billing
+	if (info.subscribed) {
+		manageBillingBtn.classList.remove("hidden");
+	} else {
+		manageBillingBtn.classList.add("hidden");
+	}
+ }
   // ------------------------------------------------
   // ACCOUNT PANEL
   // ------------------------------------------------
@@ -263,6 +272,32 @@ document.addEventListener("DOMContentLoaded", () => {
   if (upgradeLink) {
     upgradeLink.addEventListener("click", startCheckout);
   }
+
+//Manage Billing Button
+  manageBillingBtn.addEventListener("click", async () => {
+	const { data: { user } } = await sb.auth.getUser();
+	if (!user) {
+		alert("Please sign in again.");
+		return;
+	}
+
+	const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
+		method: "POST",
+		headers: {
+		"Content-Type": "application/json",
+		"X-API-KEY": API_SECRET
+		},
+		body: JSON.stringify({ user_id: user.id })
+	});
+
+	const data = await res.json();
+
+	if (data.url) {
+		window.location.href = data.url;
+	} else {
+		alert("Unable to open billing portal.");
+	}
+  });
 
   // -----------------------------------------------
   // FETCH RESULTS / SEND CHAT MESSAGE
