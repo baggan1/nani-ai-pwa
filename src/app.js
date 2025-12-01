@@ -173,35 +173,44 @@ document.addEventListener("DOMContentLoaded", () => {
   // ------------------------------------------------
   // STRIPE: Start checkout
   // ------------------------------------------------
-  async function startCheckout() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) {
-      alert("Please sign in again.");
-      return;
-    }
+ async function startCheckout() {
+  const { data: { user } } = await sb.auth.getUser();
 
-    const email = user.email;
-
-    const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": API_SECRET
-      },
-      body: JSON.stringify({
-        price_id: "price_1SWMZ5HrqVgKycWRnBd7IGOU",  // YOUR STRIPE PRICE
-        email: email,
-        user_id: user.id
-      })
-    });
-
-    const data = await res.json();
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      alert("Checkout error. Try again.");
-    }
+  if (!user) {
+    alert("Please sign in again.");
+    return;
   }
+
+  const email = user.email;
+  const user_id = user.id;
+
+  if (!email || !user_id) {
+    alert("Missing user information. Please re-login.");
+    return;
+  }
+
+  const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-KEY": API_SECRET
+    },
+    body: JSON.stringify({
+      price_id: "price_1SWMZ5HrqVgKycWRnBd7IGOU",
+      email,
+      user_id
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.checkout_url) {
+    window.location.href = data.checkout_url;
+  } else {
+    alert("Checkout error: " + (data.detail || "Try again."));
+  }
+ }
+
 
   // ------------------------------------------------
   // UPDATE UI FOR TRIAL / SUBSCRIPTION
