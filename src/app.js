@@ -274,40 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
   }
 
-
-  // ------------------------------------------------
-  // UPDATE UI FOR TRIAL / SUBSCRIPTION
-  // ------------------------------------------------
-  function updateSubscriptionUI(info) {
-    const subscribed = info.subscribed === true;
-    const trialActive = info.trial_active === true;
-
-    // Account panel text
-    accSubStatus.textContent = subscribed ? "Premium Active" : "Not Subscribed";
-    accTrialStatus.textContent = trialActive ? "Active" : "Expired";
-    accDaysLeft.textContent = info.days_left;
-
-    // Show subscribe button only if not subscribed
-    if (!subscribed) {
-      accSubscribeBtn.classList.remove("hidden");
-    } else {
-      accSubscribeBtn.classList.add("hidden");
-    }
-
-    // Upgrade banner (soft CTA)
-    if (!subscribed && trialActive) {
-      upgradeBanner.classList.remove("hidden");
-    } else {
-      upgradeBanner.classList.add("hidden");
-    }
-	
-	// Manage Billing
-	if (info.subscribed) {
-		manageBillingBtn.classList.remove("hidden");
-	} else {
-		manageBillingBtn.classList.add("hidden");
-	}
- }
   // ------------------------------------------------
   // ACCOUNT PANEL
   // ------------------------------------------------
