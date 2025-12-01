@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const upgradeLink = document.getElementById("upgrade-link");
   
   const accRoleBadge = document.getElementById("acc-role-badge");
+  const accUpgradeBlock = document.getElementById("acc-upgrade-block");
   const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
   const accUpgradeAnnual = document.getElementById("acc-upgrade-annual");
   const manageBillingBtn = document.getElementById("manage-billing-btn");
@@ -117,42 +118,40 @@ document.addEventListener("DOMContentLoaded", () => {
    }
  }
 
-// info comes from /auth/status
- function updateSubscriptionUI(info) {
-   const { trial_active, days_left, subscribed, role } = info;
+// Update Subscription - info comes from /auth/status
+function updateSubscriptionUI(info) {
+  const subscribed = info.subscribed === true;
+  const trialActive = info.trial_active === true;
 
-   setRoleBadge(role || (subscribed ? "premium" : trial_active ? "trial" : "free"));
+  // Role
+  accSubStatus.textContent = subscribed ? "Premium Active" : (trialActive ? "Free Trial" : "Free");
+  accTrialStatus.textContent = trialActive ? "Active" : "Expired";
+  accDaysLeft.textContent = info.days_left;
 
-   accTrialStatus.textContent = trial_active ? "Active" : "Expired";
-   accDaysLeft.textContent = trial_active ? `${days_left}` : "0";
-   accSubStatus.textContent = subscribed ? "Active Premium" : (trial_active ? "Free Trial" : "Free");
+  if (subscribed) {
+    // ⭐ PREMIUM USER
+    accUpgradeBlock.classList.add("hidden");   // HIDE upgrade block
+    manageBillingBtn.classList.remove("hidden");
 
-   // Upgrade / Billing button visibility
-   if (subscribed) {
-    // Premium
-     accUpgradeMonthly.classList.add("hidden");
-     accUpgradeAnnual.classList.add("hidden");
-     manageBillingBtn.classList.remove("hidden");
-     if (upgradeBanner) upgradeBanner.classList.add("hidden");
-     if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
-   } else {
-    // Not subscribed
-     manageBillingBtn.classList.add("hidden");
-     accUpgradeMonthly.classList.remove("hidden");
-     accUpgradeAnnual.classList.remove("hidden");
+    upgradeBanner.classList.add("hidden");
+    trialExpiredBox.classList.add("hidden");
 
-     if (trial_active) {
-       // Trial user → allow app but prompt with soft upsell
-       if (upgradeBanner) upgradeBanner.classList.remove("hidden");
-       if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
-     } else {
-       // Free (no trial) → show hard gate if you want
-       if (trialExpiredBox) trialExpiredBox.classList.remove("hidden");
-       if (upgradeBanner) upgradeBanner.classList.add("hidden");
-     }
-   }
- }
+  } else {
+    // ⭐ FREE or TRIAL USER
+    accUpgradeBlock.classList.remove("hidden"); // SHOW upgrade CTA
+    manageBillingBtn.classList.add("hidden");
 
+    if (trialActive) {
+      // trial user → soft upsell
+      upgradeBanner.classList.remove("hidden");
+      trialExpiredBox.classList.add("hidden");
+    } else {
+      // free user → optional hard gate
+      trialExpiredBox.classList.remove("hidden");
+      upgradeBanner.classList.add("hidden");
+    }
+  }
+}
 
 
   // ------------------------------------------------
