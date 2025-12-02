@@ -207,4 +207,194 @@ button {
   100% { opacity: 0.2; transform: translateY(0); }
 }
 
+/* -------------------------------------------------
+   CHAT MESSAGES
+-------------------------------------------------- */
+.msg-user .bubble,
+.msg-nani .bubble {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}
 
+.msg-user .bubble {
+  background: #d4f7e2;
+  color: #0a3d3d;
+}
+
+.msg-nani .bubble {
+  background: #e3f8f8;
+  color: #0a3d3d;
+}
+
+/* -------------------------------------------------
+   INPUT ROW
+-------------------------------------------------- */
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+#nani-input {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #bcdcdc;
+}
+
+#nani-send-btn {
+  padding: 12px 16px;
+  background: #14A1A1;
+  color: white;
+  border-radius: 10px;
+  border: none;
+}
+
+/* -------------------------------------------------
+   TRIAL EXPIRED BOX
+-------------------------------------------------- */
+.expired-box {
+  background: #fff4d9;
+  border: 1px solid #ffe6b3;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.expired-box h3 {
+  margin: 0 0 10px;
+  color: #c07a00;
+}
+
+/* -------------------------------------------------
+   ACCOUNT PANEL
+-------------------------------------------------- */
+.account-panel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel-content {
+  background: white;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 14px;
+  padding: 20px;
+  color: #0a3d3d;
+}
+
+/* Buttons inside account panel */
+.subscribe-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+  border: none;
+  background: #14A1A1;
+  color: white;
+}
+
+.subscribe-btn:hover {
+  background: #0e7f7f;
+}
+
+.subscribe-btn.outline {
+  background: white;
+  color: #14A1A1;
+  border: 1px solid #14A1A1;
+}
+
+.close-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: #ddd;
+  border: none;
+  color: #333;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: #c94a4a;
+  color: white;
+  border: none;
+}
+
+.logout-btn:hover {
+  background: #a83c3c;
+}
+
+/* Role Badge */
+.role-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.role-badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #e0f7f7;
+  color: #0d8f8f;
+}
+
+.role-badge.premium { background: #ffe8b0; color: #b87400; }
+.role-badge.trial { background: #e3f2fd; color: #1565c0; }
+.role-badge.free { background: #e0e0e0; color: #424242; }
+
+/* -------------------------------------------------
+   UPGRADE BANNER
+-------------------------------------------------- */
+.upgrade-banner {
+  background: #e4faf5;
+  border: 1px solid #b6e3d9;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #0c6b6b;
+  font-size: 0.95rem;
+}
+
+.upgrade-banner span {
+  color: #0d8f8f;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------
+   DARK MODE
+-------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0f1b26;
+    color: #e7f5f5;
+  }
+
+  .header { background: #14212e; }
+  #nani-chat-box { background: #13222e; border-color: #204458; }
+  .msg-user .bubble { background: #1e3a4a; color: #dceff0; }
+  .msg-nani .bubble { background: #26485d; color: #e8fbfb; }
+  #nani-input { background: #10202c; color: #e8fbfb; }
+  #nani-send-btn { background: #158b8b; }
+
+  .typing-indicator { background: #203544; }
+  .typing-dots div { background: #9cebbf; }
+}
