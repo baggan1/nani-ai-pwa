@@ -9,9 +9,7 @@ body {
   color: #0a3d3d;
 }
 
-.hidden {
-  display: none !important;
-}
+.hidden { display: none !important; }
 
 .container {
   max-width: 520px;
@@ -23,7 +21,6 @@ button {
   cursor: pointer;
   font-family: inherit;
   box-sizing: border-box;
-  transition: background 0.2s ease;
 }
 
 /* -------------------------------------------------
@@ -40,24 +37,23 @@ button {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .welcome-title {
   font-size: 1.9rem;
   font-weight: bold;
   color: #0d8f8f;
-  margin-bottom: 8px;
 }
 
 .welcome-subtitle {
   color: #116666;
   margin-bottom: 25px;
   font-size: 1rem;
-  line-height: 1.5;
 }
 
-#welcome-screen input {
+#welcome-screen input,
+#welcome-screen button {
   width: 100%;
   padding: 14px;
   border-radius: 10px;
@@ -66,50 +62,32 @@ button {
   font-size: 1rem;
 }
 
+/* Magic Link */
 #send-magic-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-size: 1rem;
   background: #14A1A1;
   color: white;
+  border: none;
 }
 
-#send-magic-btn:hover {
-  background: #0e7f7f;
-}
-
-/* Google Button */
+/* Google login */
 .google-btn {
   width: 100%;
   padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
   background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-size: 1rem;
-  margin-top: 14px;
+  align-items: center;
+  gap: 10px;
 }
 
-.google-btn:hover {
-  background: #f1f1f1;
-}
+.google-btn:hover { background: #f1f1f1; }
 
 .google-icon svg {
   width: 20px;
   height: 20px;
 }
-
-.divider {
-  margin: 20px 0;
-  font-size: 0.9rem;
-  color: #888;
-}
-
 
 /* -------------------------------------------------
    HEADER
@@ -145,7 +123,6 @@ button {
 
 .subtitle {
   color: #116666;
-  margin-top: 3px;
 }
 
 .account-btn {
@@ -153,11 +130,10 @@ button {
   right: 15px;
   top: 20px;
   padding: 8px 14px;
-  border-radius: 8px;
   background: #14A1A1;
-  color: white;
-  font-size: 0.9rem;
   border: none;
+  border-radius: 8px;
+  color: white;
 }
 
 /* -------------------------------------------------
@@ -177,60 +153,43 @@ button {
    TYPING INDICATOR
 -------------------------------------------------- */
 .typing-indicator {
-  display: flex;
-  align-items: center;
   background: #f0f5f0;
   padding: 10px 14px;
   border-radius: 12px;
   width: fit-content;
   margin: 8px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.typing-dots {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .typing-dots div {
   width: 8px;
   height: 8px;
-  background: #6dbb75;
   border-radius: 50%;
+  background: #6dbb75;
   animation: typing 1s infinite ease-in-out;
 }
 
-.typing-dots div:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots div:nth-child(3) { animation-delay: 0.4s; }
-
 @keyframes typing {
-  0% { opacity: 0.2; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-3px); }
-  100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
 }
-
 
 /* -------------------------------------------------
    CHAT MESSAGES
 -------------------------------------------------- */
-.msg-user .bubble,
-.msg-nani .bubble {
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  white-space: pre-wrap;
-}
-
 .msg-user .bubble {
   background: #d4f7e2;
-  color: #0a3d3d;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
 .msg-nani .bubble {
   background: #e3f8f8;
-  color: #0a3d3d;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
-
 
 /* -------------------------------------------------
    INPUT ROW
@@ -243,127 +202,17 @@ button {
 #nani-input {
   flex: 1;
   padding: 12px;
-  font-size: 1rem;
   border-radius: 10px;
   border: 1px solid #bcdcdc;
 }
 
 #nani-send-btn {
   padding: 12px 16px;
+  border-radius: 10px;
   background: #14A1A1;
   color: white;
-  border-radius: 10px;
   border: none;
 }
-
-
-/* -------------------------------------------------
-   TRIAL EXPIRED BOX
--------------------------------------------------- */
-.expired-box {
-  background: #fff4d9;
-  border: 1px solid #ffe6b3;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.expired-box h3 {
-  margin: 0 0 10px;
-  color: #c07a00;
-}
-
-
-/* -------------------------------------------------
-   ACCOUNT PANEL
--------------------------------------------------- */
-.account-panel {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(6px);
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 50;
-}
-
-.panel-content {
-  background: white;
-  width: 90%;
-  max-width: 380px;
-  border-radius: 14px;
-  padding: 20px;
-  color: #0a3d3d;
-}
-
-.subscribe-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 12px;
-  border: none;
-  background: #14A1A1;
-  color: white;
-}
-
-.subscribe-btn:hover {
-  background: #0e7f7f;
-}
-
-.subscribe-btn.outline {
-  background: white;
-  color: #14A1A1;
-  border: 1px solid #14A1A1;
-}
-
-.close-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  background: #ddd;
-  border: none;
-  color: #333;
-}
-
-.logout-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  background: #c94a4a;
-  color: white;
-  border: none;
-}
-
-.logout-btn:hover {
-  background: #a83c3c;
-}
-
-/* Role Badge */
-.role-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-.role-badge {
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  background: #e0f7f7;
-  color: #0d8f8f;
-}
-
-.role-badge.premium { background: #ffe8b0; color: #b87400; }
-.role-badge.trial { background: #e3f2fd; color: #1565c0; }
-.role-badge.free { background: #e0e0e0; color: #424242; }
-
 
 /* -------------------------------------------------
    UPGRADE BANNER
@@ -371,12 +220,9 @@ button {
 .upgrade-banner {
   background: #e4faf5;
   border: 1px solid #b6e3d9;
-  padding: 12px 14px;
+  padding: 12px;
   border-radius: 10px;
-  margin-bottom: 16px;
   text-align: center;
-  color: #0c6b6b;
-  font-size: 0.95rem;
 }
 
 .upgrade-banner span {
@@ -386,71 +232,94 @@ button {
   text-decoration: underline;
 }
 
+/* -------------------------------------------------
+   TRIAL EXPIRED
+-------------------------------------------------- */
+.expired-box {
+  background: #fff4d9;
+  border: 1px solid #ffe6b3;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* -------------------------------------------------
+   ACCOUNT PANEL
+-------------------------------------------------- */
+.account-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel-content {
+  background: white;
+  padding: 20px;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 14px;
+}
+
+.role-row { text-align: right; }
+.role-badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.subscribe-btn {
+  width: 100%;
+  padding: 12px;
+  background: #14A1A1;
+  color: white;
+  border-radius: 10px;
+  border: none;
+  margin-top: 12px;
+}
+
+.subscribe-btn.outline {
+  background: white;
+  color: #14A1A1;
+  border: 1px solid #14A1A1;
+}
+
+.logout-btn {
+  background: #c94a4a;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.close-btn {
+  background: #ddd;
+  color: #333;
+  padding: 12px;
+  border-radius: 10px;
+  width: 100%;
+  margin-top: 12px;
+}
 
 /* -------------------------------------------------
    SUBSCRIPTION MODAL
 -------------------------------------------------- */
 .subscribe-modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 60;
 }
 
 .subscribe-modal-content {
   background: white;
+  padding: 20px;
   width: 90%;
   max-width: 360px;
-  padding: 22px;
   border-radius: 14px;
   text-align: center;
-}
-
-.subscribe-modal-content h2 {
-  margin-top: 0;
-  color: #0d8f8f;
-}
-
-.subscribe-modal-content p {
-  color: #116666;
-  margin-bottom: 18px;
-}
-
-
-/* -------------------------------------------------
-   DARK MODE
--------------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #0f1b26;
-    color: #e7f5f5;
-  }
-
-  .header { background: #14212e; }
-  #nani-chat-box { background: #13222e; border-color: #204458; }
-  .msg-user .bubble { background: #1e3a4a; color: #dceff0; }
-  .msg-nani .bubble { background: #26485d; color: #e8fbfb; }
-  #nani-input { background: #10202c; color: #e8fbfb; }
-  #nani-send-btn { background: #158b8b; }
-
-  .typing-indicator { background: #203544; }
-  .typing-dots div { background: #9cebbf; }
-
-  .panel-content,
-  .subscribe-modal-content {
-    background: #1c2c38;
-    color: #e8fbfb;
-  }
-
-  .subscribe-btn.outline {
-    background: transparent;
-    border-color: #14A1A1;
-    color: #14A1A1;
-  }
 }

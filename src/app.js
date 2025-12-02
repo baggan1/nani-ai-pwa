@@ -1,9 +1,10 @@
 /***************************************************
  * NANI-AI PWA (Supabase Auth + Automatic Trial)
- * Updated: Stripe checkout + unified subscription modal
+ * Final Version — Unified Modal Subscription Flow
  ***************************************************/
 
 document.addEventListener("DOMContentLoaded", () => {
+
   // -----------------------------------------------
   // ENV VARS (Vite → Vercel)
   // -----------------------------------------------
@@ -13,49 +14,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // Stripe Price IDs (PRODUCTION)
+  const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
+  const STRIPE_ANNUAL_PRICE_ID  = "price_1SWNgmQZiiSZQI7eSqTsjwhm";
+
+
   // -----------------------------------------------
   // DOM ELEMENTS
   // -----------------------------------------------
-  const welcomeScreen = document.getElementById("welcome-screen");
-  const chatApp = document.getElementById("chat-app");
+  const welcomeScreen    = document.getElementById("welcome-screen");
+  const chatApp          = document.getElementById("chat-app");
 
-  const magicEmailInput = document.getElementById("magic-email");
-  const sendMagicBtn = document.getElementById("send-magic-btn");
-  const googleBtn = document.getElementById("google-btn");
+  const magicEmailInput  = document.getElementById("magic-email");
+  const sendMagicBtn     = document.getElementById("send-magic-btn");
+  const googleBtn        = document.getElementById("google-btn");
 
-  const chatBox = document.getElementById("nani-chat-box");
-  const inputField = document.getElementById("nani-input");
-  const sendBtn = document.getElementById("nani-send-btn");
+  const chatBox          = document.getElementById("nani-chat-box");
+  const inputField       = document.getElementById("nani-input");
+  const sendBtn          = document.getElementById("nani-send-btn");
 
-  const accountBtn = document.getElementById("account-btn");
-  const accountPanel = document.getElementById("account-panel");
-  const accEmail = document.getElementById("acc-email");
-  const accTrialStatus = document.getElementById("acc-trial-status");
-  const accDaysLeft = document.getElementById("acc-days-left");
-  const accSubStatus = document.getElementById("acc-sub-status");
-  const accCloseBtn = document.getElementById("acc-close");
+  const accountBtn       = document.getElementById("account-btn");
+  const accountPanel     = document.getElementById("account-panel");
 
-  const upgradeBanner = document.getElementById("upgrade-banner");
-  const upgradeLink = document.getElementById("upgrade-link");
+  const accEmail         = document.getElementById("acc-email");
+  const accTrialStatus   = document.getElementById("acc-trial-status");
+  const accDaysLeft      = document.getElementById("acc-days-left");
+  const accSubStatus     = document.getElementById("acc-sub-status");
+  const accRoleBadge     = document.getElementById("acc-role-badge");
 
-  const accRoleBadge = document.getElementById("acc-role-badge");
-  const accUpgradeBlock = document.getElementById("acc-upgrade-block");
-  const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
-  const accUpgradeAnnual = document.getElementById("acc-upgrade-annual");
+  const accUpgradeBlock  = document.getElementById("acc-upgrade-block");
+  const accUpgradeOpen   = document.getElementById("acc-upgrade-open");
+
   const manageBillingBtn = document.getElementById("manage-billing-btn");
-  const accLogoutBtn = document.getElementById("acc-logout-btn");
-  const trialExpiredBox = document.getElementById("trial-expired");
-  const trialExpiredSubscribeBtn = document.getElementById("subscribe-btn");
+  const accLogoutBtn     = document.getElementById("acc-logout-btn");
+  const accCloseBtn      = document.getElementById("acc-close");
 
-  // Subscription modal
-  const subscribeModal = document.getElementById("subscribe-modal");
-  const subMonthlyBtn = document.getElementById("sub-monthly");
-  const subAnnualBtn = document.getElementById("sub-annual");
-  const subCancelBtn = document.getElementById("sub-cancel");
+  const upgradeBanner    = document.getElementById("upgrade-banner");
+  const upgradeLink      = document.getElementById("upgrade-link");
 
-  // Stripe Prices (LIVE)
-  const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
-  const STRIPE_ANNUAL_PRICE_ID = "price_1SWNgmQZiiSZQI7eSqTsjwhm";
+  const trialExpiredBox  = document.getElementById("trial-expired");
+  const trialSubscribeBtn = document.getElementById("subscribe-btn");
+
+  const subscribeModal   = document.getElementById("subscribe-modal");
+  const subMonthlyBtn    = document.getElementById("sub-monthly");
+  const subAnnualBtn     = document.getElementById("sub-annual");
+  const subCancelBtn     = document.getElementById("sub-cancel");
+
 
   // -----------------------------------------------
   // STATE
@@ -63,16 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let session = null;
   let accessToken = null;
   let userEmail = null;
-
-  // Typing indicator
   let typingBubble = null;
 
   // -----------------------------------------------
   // HELPERS
   // -----------------------------------------------
-  function showScreen(isAuthed) {
-    welcomeScreen.style.display = isAuthed ? "none" : "block";
-    chatApp.style.display = isAuthed ? "block" : "none";
+  function showScreen(authed) {
+    welcomeScreen.style.display = authed ? "none" : "block";
+    chatApp.style.display       = authed ? "block" : "none";
   }
 
   function appendMessage(sender, text) {
@@ -89,9 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
     typingBubble.className = "msg-nani";
     typingBubble.innerHTML = `
       <div class="typing-indicator">
-        <div class="typing-dots"><div></div><div></div><div></div></div>
-      </div>
-    `;
+        <div class="typing-dots">
+          <div></div><div></div><div></div>
+        </div>
+      </div>`;
     chatBox.appendChild(typingBubble);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
@@ -104,8 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setRoleBadge(role) {
-    if (!accRoleBadge) return;
-
     accRoleBadge.classList.remove("premium", "trial", "free");
 
     if (role === "premium") {
@@ -120,69 +121,58 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Update Subscription UI — info comes from /auth/status
+
+  // -----------------------------------------------
+  // UPDATE SUBSCRIPTION UI
+  // -----------------------------------------------
   function updateSubscriptionUI(info) {
-    const subscribed = info.subscribed === true;
-    const trialActive = info.trial_active === true;
+    const isSubscribed = info.subscribed === true;
+    const trialActive  = info.trial_active === true;
 
-    // Role badge
-    setRoleBadge(subscribed ? "premium" : trialActive ? "trial" : "free");
-
-    // Text
-    accSubStatus.textContent = subscribed
-      ? "Premium Active"
-      : trialActive
-      ? "Free Trial"
-      : "Free";
+    accSubStatus.textContent   = isSubscribed ? "Premium Active" : (trialActive ? "Trial Active" : "Free");
     accTrialStatus.textContent = trialActive ? "Active" : "Expired";
-    accDaysLeft.textContent = info.days_left;
+    accDaysLeft.textContent    = info.days_left;
 
-    if (subscribed) {
-      // ⭐ PREMIUM USER
-      if (accUpgradeBlock) accUpgradeBlock.classList.add("hidden");
-      if (manageBillingBtn) manageBillingBtn.classList.remove("hidden");
-      if (upgradeBanner) upgradeBanner.classList.add("hidden");
-      if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
+    // Hide/Show upgrade areas
+    if (isSubscribed) {
+      accUpgradeBlock.classList.add("hidden");
+      upgradeBanner.classList.add("hidden");
+      trialExpiredBox.classList.add("hidden");
+      manageBillingBtn.classList.remove("hidden");
+
+    } else if (trialActive) {
+      accUpgradeBlock.classList.remove("hidden");
+      upgradeBanner.classList.remove("hidden");
+      manageBillingBtn.classList.add("hidden");
+      trialExpiredBox.classList.add("hidden");
+
     } else {
-      // ⭐ FREE or TRIAL USER
-      if (accUpgradeBlock) accUpgradeBlock.classList.remove("hidden");
-      if (manageBillingBtn) manageBillingBtn.classList.add("hidden");
-
-      if (trialActive) {
-        // Trial user → soft upsell banner
-        if (upgradeBanner) upgradeBanner.classList.remove("hidden");
-        if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
-      } else {
-        // Trial ended → show hard gate
-        if (upgradeBanner) upgradeBanner.classList.add("hidden");
-        if (trialExpiredBox) trialExpiredBox.classList.remove("hidden");
-      }
+      accUpgradeBlock.classList.remove("hidden");
+      manageBillingBtn.classList.add("hidden");
+      upgradeBanner.classList.add("hidden");
+      trialExpiredBox.classList.remove("hidden");
     }
   }
 
+
   // -----------------------------------------------
-  // SUBSCRIPTION MODAL CONTROLS
+  // SUBSCRIBE MODAL CONTROL
   // -----------------------------------------------
   function openSubscribeModal() {
-    if (subscribeModal) {
-      subscribeModal.classList.remove("hidden");
-    }
+    subscribeModal.classList.remove("hidden");
   }
 
   function closeSubscribeModal() {
-    if (subscribeModal) {
-      subscribeModal.classList.add("hidden");
-    }
+    subscribeModal.classList.add("hidden");
   }
 
-  if (subCancelBtn) {
-    subCancelBtn.addEventListener("click", closeSubscribeModal);
-  }
+  subCancelBtn.addEventListener("click", closeSubscribeModal);
 
-  // ------------------------------------------------
-  // LEARN SESSION IF ALREADY LOGGED IN
-  // ------------------------------------------------
-  async function loadExistingSession() {
+
+  // -----------------------------------------------
+  // LOAD EXISTING SESSION
+  // -----------------------------------------------
+  async function loadSession() {
     const { data } = await sb.auth.getSession();
 
     if (data.session) {
@@ -199,58 +189,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  loadExistingSession();
+  loadSession();
+
 
   // -----------------------------------------------
-  // LOGIN: MAGIC LINK
+  // AUTH: MAGIC LINK
   // -----------------------------------------------
-  if (sendMagicBtn) {
-    sendMagicBtn.addEventListener("click", async () => {
-      const email = magicEmailInput.value.trim();
+  sendMagicBtn.addEventListener("click", async () => {
+    const email = magicEmailInput.value.trim();
+    if (!email.includes("@")) {
+      alert("Enter a valid email");
+      return;
+    }
 
-      if (!email.includes("@")) {
-        alert("Please enter a valid email.");
-        return;
-      }
+    sendMagicBtn.textContent = "Sending...";
 
-      sendMagicBtn.innerText = "Sending...";
-
-      try {
-        const { error } = await sb.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: window.location.origin }
-        });
-
-        if (error) alert("Error: " + error.message);
-        else alert("Magic link sent! Check your email.");
-      } catch {
-        alert("Failed to send magic link.");
-      }
-
-      sendMagicBtn.innerText = "Send One-Time Login Link";
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin }
     });
-  }
+
+    sendMagicBtn.textContent = "Send One-Time Login Link";
+
+    if (error) alert(error.message);
+    else alert("Magic link sent. Check your inbox.");
+  });
+
 
   // -----------------------------------------------
-  // LOGIN: GOOGLE
+  // AUTH: GOOGLE
   // -----------------------------------------------
-  if (googleBtn) {
-    googleBtn.addEventListener("click", async () => {
-      try {
-        await sb.auth.signInWithOAuth({
-          provider: "google",
-          options: { redirectTo: window.location.origin }
-        });
-      } catch {
-        alert("Google login failed.");
-      }
+  googleBtn.addEventListener("click", async () => {
+    await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin }
     });
-  }
+  });
+
 
   // -----------------------------------------------
   // AUTH STATE CHANGE
   // -----------------------------------------------
-  sb.auth.onAuthStateChange(async (_event, newSession) => {
+  sb.auth.onAuthStateChange((_event, newSession) => {
     if (newSession) {
       session = newSession;
       accessToken = newSession.access_token;
@@ -258,29 +238,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       localStorage.setItem("nani_access_token", accessToken);
       localStorage.setItem("nani_user_email", userEmail);
-
       showScreen(true);
     }
   });
 
-  // ------------------------------------------------
-  // STRIPE: Start checkout
-  // ------------------------------------------------
+
+  // -----------------------------------------------
+  // STRIPE CHECKOUT FLOW
+  // -----------------------------------------------
   async function startCheckout(priceId) {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) {
-      alert("Please sign in again.");
+      alert("Please log in again.");
       return;
     }
 
-    const email = user.email;
-    const userId = user.id;
-
-    if (!priceId) {
-      priceId = STRIPE_MONTHLY_PRICE_ID;
-    }
-
-    const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+    const response = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -288,132 +261,113 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       body: JSON.stringify({
         price_id: priceId,
-        email,
-        user_id: userId
+        email: user.email,
+        user_id: user.id
       })
     });
 
-    const data = await res.json();
+    const data = await response.json();
+
     if (data.checkout_url) {
       window.location.href = data.checkout_url;
     } else {
-      alert("Checkout error. Try again.");
+      console.error(data);
+      alert("Checkout could not start.");
     }
   }
 
-  // ------------------------------------------------
-  // ACCOUNT PANEL
-  // ------------------------------------------------
-  if (accountBtn) {
-    accountBtn.addEventListener("click", async () => {
-      if (!accessToken) {
-        accEmail.textContent = "Not logged in";
-        accountPanel.classList.remove("hidden");
-        return;
-      }
-
-      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-        headers: {
-          "X-API-KEY": API_SECRET,
-          "Authorization": `Bearer ${accessToken}`
-        }
-      });
-
-      const data = await res.json();
-
-      accEmail.textContent = userEmail;
-      updateSubscriptionUI(data);
-
-      accountPanel.classList.remove("hidden");
-    });
-  }
-
-  if (accCloseBtn) {
-    accCloseBtn.addEventListener("click", () => {
-      accountPanel.classList.add("hidden");
-    });
-  }
-
-  // Account panel upgrade buttons → open modal
-  if (accUpgradeMonthly) {
-    accUpgradeMonthly.addEventListener("click", openSubscribeModal);
-  }
-  if (accUpgradeAnnual) {
-    accUpgradeAnnual.addEventListener("click", openSubscribeModal);
-  }
-
-  // Soft banner Subscribe → modal
-  if (upgradeLink) {
-    upgradeLink.addEventListener("click", openSubscribeModal);
-  }
-
-  // Trial expired Subscribe → modal
-  if (trialExpiredSubscribeBtn) {
-    trialExpiredSubscribeBtn.addEventListener("click", openSubscribeModal);
-  }
-
-  // Modal buttons → Stripe checkout
-  if (subMonthlyBtn) {
-    subMonthlyBtn.addEventListener("click", () => {
-      closeSubscribeModal();
-      startCheckout(STRIPE_MONTHLY_PRICE_ID);
-    });
-  }
-
-  if (subAnnualBtn) {
-    subAnnualBtn.addEventListener("click", () => {
-      closeSubscribeModal();
-      startCheckout(STRIPE_ANNUAL_PRICE_ID);
-    });
-  }
-
-  // Manage Billing Button
-  if (manageBillingBtn) {
-    manageBillingBtn.addEventListener("click", async () => {
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) {
-        alert("Please sign in again.");
-        return;
-      }
-
-      const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": API_SECRET
-        },
-        body: JSON.stringify({ user_id: user.id })
-      });
-
-      const data = await res.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Unable to open billing portal.");
-      }
-    });
-  }
-
-  // User Account Logout Button (single, clean handler)
-  if (accLogoutBtn) {
-    accLogoutBtn.addEventListener("click", async () => {
-      try {
-        await sb.auth.signOut();
-      } catch (e) {
-        console.error("Logout error", e);
-      }
-      localStorage.removeItem("nani_access_token");
-      localStorage.removeItem("nani_user_email");
-      accessToken = null;
-      userEmail = null;
-      showScreen(false);      // back to welcome screen
-      accountPanel.classList.add("hidden");
-    });
-  }
 
   // -----------------------------------------------
-  // FETCH RESULTS / SEND CHAT MESSAGE
+  // ACCOUNT PANEL OPEN
+  // -----------------------------------------------
+  accountBtn.addEventListener("click", async () => {
+    if (!accessToken) {
+      accountPanel.classList.remove("hidden");
+      return;
+    }
+
+    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+      headers: {
+        "X-API-KEY": API_SECRET,
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    const info = await res.json();
+
+    accEmail.textContent = userEmail;
+    setRoleBadge(info.role);
+    updateSubscriptionUI(info);
+
+    accountPanel.classList.remove("hidden");
+  });
+
+  accCloseBtn.addEventListener("click", () => {
+    accountPanel.classList.add("hidden");
+  });
+
+
+  // -----------------------------------------------
+  // PREMIUM UPGRADE BUTTON → OPEN MODAL
+  // -----------------------------------------------
+  accUpgradeOpen.addEventListener("click", openSubscribeModal);
+  upgradeLink.addEventListener("click", openSubscribeModal);
+  trialSubscribeBtn.addEventListener("click", openSubscribeModal);
+
+
+  // -----------------------------------------------
+  // SUBSCRIPTION CHOICES
+  // -----------------------------------------------
+  subMonthlyBtn.addEventListener("click", () => {
+    closeSubscribeModal();
+    startCheckout(STRIPE_MONTHLY_PRICE_ID);
+  });
+
+  subAnnualBtn.addEventListener("click", () => {
+    closeSubscribeModal();
+    startCheckout(STRIPE_ANNUAL_PRICE_ID);
+  });
+
+
+  // -----------------------------------------------
+  // MANAGE BILLING (Premium Only)
+  // -----------------------------------------------
+  manageBillingBtn.addEventListener("click", async () => {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+
+    const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": API_SECRET
+      },
+      body: JSON.stringify({ user_id: user.id })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Unable to open billing portal.");
+    }
+  });
+
+
+  // -----------------------------------------------
+  // LOGOUT
+  // -----------------------------------------------
+  accLogoutBtn.addEventListener("click", async () => {
+    await sb.auth.signOut();
+    localStorage.clear();
+    showScreen(false);
+    accountPanel.classList.add("hidden");
+  });
+
+
+  // -----------------------------------------------
+  // SEND MESSAGE → NANI
   // -----------------------------------------------
   async function sendToNani() {
     const query = inputField.value.trim();
@@ -452,35 +406,16 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         appendMessage("nani", data.summary);
       }
-    } catch {
+
+    } catch (err) {
       hideTyping();
       appendMessage("nani", "⚠️ Network error. Try again.");
     }
   }
 
-  if (sendBtn) {
-    sendBtn.addEventListener("click", sendToNani);
-  }
-  if (inputField) {
-    inputField.addEventListener("keypress", e => {
-      if (e.key === "Enter") sendToNani();
-    });
-  }
+  sendBtn.addEventListener("click", sendToNani);
+  inputField.addEventListener("keypress", e => {
+    if (e.key === "Enter") sendToNani();
+  });
 
-  // -----------------------------------------------
-  // SEASONAL THEME
-  // -----------------------------------------------
-  function applyTheme() {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return;
-    }
-
-    const month = new Date().getMonth();
-    if (month <= 1 || month === 11) document.body.classList.add("winter");
-    else if (month <= 4) document.body.classList.add("spring");
-    else if (month <= 7) document.body.classList.add("summer");
-    else document.body.classList.add("fall");
-  }
-
-  applyTheme();
 });
