@@ -1,10 +1,9 @@
 /***************************************************
  * NANI-AI PWA (Supabase Auth + Automatic Trial)
- * Updated: Stripe checkout + upgrade banner
+ * Updated: Stripe checkout + unified subscription modal
  ***************************************************/
 
 document.addEventListener("DOMContentLoaded", () => {
-
   // -----------------------------------------------
   // ENV VARS (Vite → Vercel)
   // -----------------------------------------------
@@ -20,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const welcomeScreen = document.getElementById("welcome-screen");
   const chatApp = document.getElementById("chat-app");
 
-  const magicEmailInput = document.getElementById("magic-email"); 
+  const magicEmailInput = document.getElementById("magic-email");
   const sendMagicBtn = document.getElementById("send-magic-btn");
   const googleBtn = document.getElementById("google-btn");
 
@@ -34,12 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const accTrialStatus = document.getElementById("acc-trial-status");
   const accDaysLeft = document.getElementById("acc-days-left");
   const accSubStatus = document.getElementById("acc-sub-status");
-  const accSubscribeBtn = document.getElementById("acc-subscribe-btn");
   const accCloseBtn = document.getElementById("acc-close");
 
   const upgradeBanner = document.getElementById("upgrade-banner");
   const upgradeLink = document.getElementById("upgrade-link");
-  
+
   const accRoleBadge = document.getElementById("acc-role-badge");
   const accUpgradeBlock = document.getElementById("acc-upgrade-block");
   const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
@@ -47,10 +45,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const manageBillingBtn = document.getElementById("manage-billing-btn");
   const accLogoutBtn = document.getElementById("acc-logout-btn");
   const trialExpiredBox = document.getElementById("trial-expired");
+  const trialExpiredSubscribeBtn = document.getElementById("subscribe-btn");
 
+  // Subscription modal
+  const subscribeModal = document.getElementById("subscribe-modal");
+  const subMonthlyBtn = document.getElementById("sub-monthly");
+  const subAnnualBtn = document.getElementById("sub-annual");
+  const subCancelBtn = document.getElementById("sub-cancel");
+
+  // Stripe Prices (LIVE)
   const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
   const STRIPE_ANNUAL_PRICE_ID = "price_1SWNgmQZiiSZQI7eSqTsjwhm";
-
 
   // -----------------------------------------------
   // STATE
@@ -73,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function appendMessage(sender, text) {
     const wrapper = document.createElement("div");
     wrapper.className = sender === "user" ? "msg-user" : "msg-nani";
-
     wrapper.innerHTML = `<div class="bubble">${text.replace(/\n/g, "<br>")}</div>`;
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -100,55 +104,80 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setRoleBadge(role) {
-   accRoleBadge.classList.remove("premium", "trial", "free");
+    if (!accRoleBadge) return;
 
-   if (role === "premium") {
-     accRoleBadge.textContent = "Premium";
-     accRoleBadge.classList.add("premium");
-   } else if (role === "trial") {
-     accRoleBadge.textContent = "Trial";
-     accRoleBadge.classList.add("trial");
-   } else {
-     accRoleBadge.textContent = "Free";
-     accRoleBadge.classList.add("free");
-   }
- }
+    accRoleBadge.classList.remove("premium", "trial", "free");
 
-// Update Subscription - info comes from /auth/status
-function updateSubscriptionUI(info) {
-  const subscribed = info.subscribed === true;
-  const trialActive = info.trial_active === true;
-
-  // Role
-  accSubStatus.textContent = subscribed ? "Premium Active" : (trialActive ? "Free Trial" : "Free");
-  accTrialStatus.textContent = trialActive ? "Active" : "Expired";
-  accDaysLeft.textContent = info.days_left;
-
-  if (subscribed) {
-    // ⭐ PREMIUM USER
-    accUpgradeBlock.classList.add("hidden");   // HIDE upgrade block
-    manageBillingBtn.classList.remove("hidden");
-
-    upgradeBanner.classList.add("hidden");
-    trialExpiredBox.classList.add("hidden");
-
-  } else {
-    // ⭐ FREE or TRIAL USER
-    accUpgradeBlock.classList.remove("hidden"); // SHOW upgrade CTA
-    manageBillingBtn.classList.add("hidden");
-
-    if (trialActive) {
-      // trial user → soft upsell
-      upgradeBanner.classList.remove("hidden");
-      trialExpiredBox.classList.add("hidden");
+    if (role === "premium") {
+      accRoleBadge.textContent = "Premium";
+      accRoleBadge.classList.add("premium");
+    } else if (role === "trial") {
+      accRoleBadge.textContent = "Trial";
+      accRoleBadge.classList.add("trial");
     } else {
-      // free user → optional hard gate
-      trialExpiredBox.classList.remove("hidden");
-      upgradeBanner.classList.add("hidden");
+      accRoleBadge.textContent = "Free";
+      accRoleBadge.classList.add("free");
     }
   }
-}
 
+  // Update Subscription UI — info comes from /auth/status
+  function updateSubscriptionUI(info) {
+    const subscribed = info.subscribed === true;
+    const trialActive = info.trial_active === true;
+
+    // Role badge
+    setRoleBadge(subscribed ? "premium" : trialActive ? "trial" : "free");
+
+    // Text
+    accSubStatus.textContent = subscribed
+      ? "Premium Active"
+      : trialActive
+      ? "Free Trial"
+      : "Free";
+    accTrialStatus.textContent = trialActive ? "Active" : "Expired";
+    accDaysLeft.textContent = info.days_left;
+
+    if (subscribed) {
+      // ⭐ PREMIUM USER
+      if (accUpgradeBlock) accUpgradeBlock.classList.add("hidden");
+      if (manageBillingBtn) manageBillingBtn.classList.remove("hidden");
+      if (upgradeBanner) upgradeBanner.classList.add("hidden");
+      if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
+    } else {
+      // ⭐ FREE or TRIAL USER
+      if (accUpgradeBlock) accUpgradeBlock.classList.remove("hidden");
+      if (manageBillingBtn) manageBillingBtn.classList.add("hidden");
+
+      if (trialActive) {
+        // Trial user → soft upsell banner
+        if (upgradeBanner) upgradeBanner.classList.remove("hidden");
+        if (trialExpiredBox) trialExpiredBox.classList.add("hidden");
+      } else {
+        // Trial ended → show hard gate
+        if (upgradeBanner) upgradeBanner.classList.add("hidden");
+        if (trialExpiredBox) trialExpiredBox.classList.remove("hidden");
+      }
+    }
+  }
+
+  // -----------------------------------------------
+  // SUBSCRIPTION MODAL CONTROLS
+  // -----------------------------------------------
+  function openSubscribeModal() {
+    if (subscribeModal) {
+      subscribeModal.classList.remove("hidden");
+    }
+  }
+
+  function closeSubscribeModal() {
+    if (subscribeModal) {
+      subscribeModal.classList.add("hidden");
+    }
+  }
+
+  if (subCancelBtn) {
+    subCancelBtn.addEventListener("click", closeSubscribeModal);
+  }
 
   // ------------------------------------------------
   // LEARN SESSION IF ALREADY LOGGED IN
@@ -175,44 +204,48 @@ function updateSubscriptionUI(info) {
   // -----------------------------------------------
   // LOGIN: MAGIC LINK
   // -----------------------------------------------
-  sendMagicBtn.addEventListener("click", async () => {
-    const email = magicEmailInput.value.trim();
+  if (sendMagicBtn) {
+    sendMagicBtn.addEventListener("click", async () => {
+      const email = magicEmailInput.value.trim();
 
-    if (!email.includes("@")) {
-      alert("Please enter a valid email.");
-      return;
-    }
+      if (!email.includes("@")) {
+        alert("Please enter a valid email.");
+        return;
+      }
 
-    sendMagicBtn.innerText = "Sending...";
+      sendMagicBtn.innerText = "Sending...";
 
-    try {
-      const { error } = await sb.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin }
-      });
+      try {
+        const { error } = await sb.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: window.location.origin }
+        });
 
-      if (error) alert("Error: " + error.message);
-      else alert("Magic link sent! Check your email.");
-    } catch {
-      alert("Failed to send magic link.");
-    }
+        if (error) alert("Error: " + error.message);
+        else alert("Magic link sent! Check your email.");
+      } catch {
+        alert("Failed to send magic link.");
+      }
 
-    sendMagicBtn.innerText = "Send One-Time Login Link";
-  });
+      sendMagicBtn.innerText = "Send One-Time Login Link";
+    });
+  }
 
   // -----------------------------------------------
   // LOGIN: GOOGLE
   // -----------------------------------------------
-  googleBtn.addEventListener("click", async () => {
-    try {
-      await sb.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin },
-      });
-    } catch {
-      alert("Google login failed.");
-    }
-  });
+  if (googleBtn) {
+    googleBtn.addEventListener("click", async () => {
+      try {
+        await sb.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: window.location.origin }
+        });
+      } catch {
+        alert("Google login failed.");
+      }
+    });
+  }
 
   // -----------------------------------------------
   // AUTH STATE CHANGE
@@ -233,142 +266,151 @@ function updateSubscriptionUI(info) {
   // ------------------------------------------------
   // STRIPE: Start checkout
   // ------------------------------------------------
- async function startCheckout(priceId) {
-	const { data: { user } } = await sb.auth.getUser();
-	if (!user) {
-		alert("Please sign in again.");
-		return;
-	}
+  async function startCheckout(priceId) {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) {
+      alert("Please sign in again.");
+      return;
+    }
 
-	const email = user.email;
-	const userId = user.id;
+    const email = user.email;
+    const userId = user.id;
 
-	if (!priceId) {
-		// default to monthly if none passed
-		priceId = STRIPE_MONTHLY_PRICE_ID;
-	}
+    if (!priceId) {
+      priceId = STRIPE_MONTHLY_PRICE_ID;
+    }
 
-	const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
-		method: "POST",
-		headers: {
-		"Content-Type": "application/json",
-		"X-API-KEY": API_SECRET
-		},
-		body: JSON.stringify({
-		price_id: priceId,
-		email: email,
-		user_id: userId
-		})
-	});
+    const res = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": API_SECRET
+      },
+      body: JSON.stringify({
+        price_id: priceId,
+        email,
+        user_id: userId
+      })
+    });
 
-	const data = await res.json();
-	if (data.checkout_url) {
-		window.location.href = data.checkout_url;
-	} else {
-		alert("Checkout error. Try again.");
-	}
+    const data = await res.json();
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      alert("Checkout error. Try again.");
+    }
   }
 
   // ------------------------------------------------
   // ACCOUNT PANEL
   // ------------------------------------------------
-  accountBtn.addEventListener("click", async () => {
-    if (!accessToken) {
-      accEmail.textContent = "Not logged in";
-      accountPanel.classList.remove("hidden");
-      return;
-    }
+  if (accountBtn) {
+    accountBtn.addEventListener("click", async () => {
+      if (!accessToken) {
+        accEmail.textContent = "Not logged in";
+        accountPanel.classList.remove("hidden");
+        return;
+      }
 
-    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-      headers: {
-        "X-API-KEY": API_SECRET,
-        "Authorization": `Bearer ${accessToken}`
+      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+        headers: {
+          "X-API-KEY": API_SECRET,
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+
+      const data = await res.json();
+
+      accEmail.textContent = userEmail;
+      updateSubscriptionUI(data);
+
+      accountPanel.classList.remove("hidden");
+    });
+  }
+
+  if (accCloseBtn) {
+    accCloseBtn.addEventListener("click", () => {
+      accountPanel.classList.add("hidden");
+    });
+  }
+
+  // Account panel upgrade buttons → open modal
+  if (accUpgradeMonthly) {
+    accUpgradeMonthly.addEventListener("click", openSubscribeModal);
+  }
+  if (accUpgradeAnnual) {
+    accUpgradeAnnual.addEventListener("click", openSubscribeModal);
+  }
+
+  // Soft banner Subscribe → modal
+  if (upgradeLink) {
+    upgradeLink.addEventListener("click", openSubscribeModal);
+  }
+
+  // Trial expired Subscribe → modal
+  if (trialExpiredSubscribeBtn) {
+    trialExpiredSubscribeBtn.addEventListener("click", openSubscribeModal);
+  }
+
+  // Modal buttons → Stripe checkout
+  if (subMonthlyBtn) {
+    subMonthlyBtn.addEventListener("click", () => {
+      closeSubscribeModal();
+      startCheckout(STRIPE_MONTHLY_PRICE_ID);
+    });
+  }
+
+  if (subAnnualBtn) {
+    subAnnualBtn.addEventListener("click", () => {
+      closeSubscribeModal();
+      startCheckout(STRIPE_ANNUAL_PRICE_ID);
+    });
+  }
+
+  // Manage Billing Button
+  if (manageBillingBtn) {
+    manageBillingBtn.addEventListener("click", async () => {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) {
+        alert("Please sign in again.");
+        return;
+      }
+
+      const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_SECRET
+        },
+        body: JSON.stringify({ user_id: user.id })
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Unable to open billing portal.");
       }
     });
-
-    const data = await res.json();
-
-    accEmail.textContent = userEmail;
-    updateSubscriptionUI(data);
-
-    accountPanel.classList.remove("hidden");
-  });
-
-  accCloseBtn.addEventListener("click", () => {
-    accountPanel.classList.add("hidden");
-  });
-
-  // Stripe checkout from account panel
-  //accSubscribeBtn.addEventListener("click", startCheckout);
-  
-  accUpgradeMonthly.addEventListener("click", () => {
-  startCheckout(STRIPE_MONTHLY_PRICE_ID);
-  });
-
-  accUpgradeAnnual.addEventListener("click", () => {
-  startCheckout(STRIPE_ANNUAL_PRICE_ID);
-  });
-
-  // Stripe checkout from banner
-  /*if (upgradeLink) {
-    upgradeLink.addEventListener("click", startCheckout);
-  }*/
-  
-  if (accSubscribeBtn) {
-  accSubscribeBtn.addEventListener("click", () => startCheckout(STRIPE_MONTHLY_PRICE_ID));
-  }
-  if (upgradeLink) {
-  upgradeLink.addEventListener("click", () => startCheckout(STRIPE_MONTHLY_PRICE_ID));
   }
 
-//Manage Billing Button
-  manageBillingBtn.addEventListener("click", async () => {
-	const { data: { user } } = await sb.auth.getUser();
-	if (!user) {
-		alert("Please sign in again.");
-		return;
-	}
-
-	const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
-		method: "POST",
-		headers: {
-		"Content-Type": "application/json",
-		"X-API-KEY": API_SECRET
-		},
-		body: JSON.stringify({ user_id: user.id })
-	});
-
-	const data = await res.json();
-
-	if (data.url) {
-		window.location.href = data.url;
-	} else {
-		alert("Unable to open billing portal.");
-	}
-  });
-//User Account Logout Button
-  accLogoutBtn.addEventListener("click", async () => {
-	await sb.auth.signOut();
-	localStorage.clear();
-	window.location.href = "/"; // Redirects to login screen
-  });
-
-//-----------------------------------------------
-//SIGN-OUT----------------------------------------
-//------------------------------------------------
-accLogoutBtn.addEventListener("click", async () => {
-  try {
-    await sb.auth.signOut();
-  } catch (e) {
-    console.error("Logout error", e);
+  // User Account Logout Button (single, clean handler)
+  if (accLogoutBtn) {
+    accLogoutBtn.addEventListener("click", async () => {
+      try {
+        await sb.auth.signOut();
+      } catch (e) {
+        console.error("Logout error", e);
+      }
+      localStorage.removeItem("nani_access_token");
+      localStorage.removeItem("nani_user_email");
+      accessToken = null;
+      userEmail = null;
+      showScreen(false);      // back to welcome screen
+      accountPanel.classList.add("hidden");
+    });
   }
-  localStorage.removeItem("nani_access_token");
-  localStorage.removeItem("nani_user_email");
-  accessToken = null;
-  userEmail = null;
-  showScreen(false);      // back to welcome screen
-  accountPanel.classList.add("hidden");
-});
 
   // -----------------------------------------------
   // FETCH RESULTS / SEND CHAT MESSAGE
@@ -393,13 +435,13 @@ accLogoutBtn.addEventListener("click", async () => {
         headers: {
           "Content-Type": "application/json",
           "X-API-KEY": API_SECRET,
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${accessToken}`
         },
         body: JSON.stringify({
           query,
           match_threshold: 0.4,
-          match_count: 3,
-        }),
+          match_count: 3
+        })
       });
 
       const data = await res.json();
@@ -410,17 +452,20 @@ accLogoutBtn.addEventListener("click", async () => {
       } else {
         appendMessage("nani", data.summary);
       }
-
     } catch {
       hideTyping();
       appendMessage("nani", "⚠️ Network error. Try again.");
     }
   }
 
-  sendBtn.addEventListener("click", sendToNani);
-  inputField.addEventListener("keypress", e => {
-    if (e.key === "Enter") sendToNani();
-  });
+  if (sendBtn) {
+    sendBtn.addEventListener("click", sendToNani);
+  }
+  if (inputField) {
+    inputField.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendToNani();
+    });
+  }
 
   // -----------------------------------------------
   // SEASONAL THEME

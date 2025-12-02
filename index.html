@@ -15,19 +15,18 @@
 
 <body>
 
-  <!-- 🌿 WELCOME SCREEN (LOGIN) -->
-<!-- 🌿 WELCOME SCREEN (LOGIN) -->
+<!-- 🌿 WELCOME SCREEN -->
 <div id="welcome-screen" class="welcome-screen">
 
-  <img src="/icons/nani-avatar.png" class="welcome-avatar" />
+  <img src="/icons/nani-avatar.png" class="welcome-avatar" alt="Nani-AI Avatar" />
 
   <h1 class="welcome-title">Welcome to Nani-AI</h1>
   <p class="welcome-subtitle">
-    Your natural wellness guide. Sign in to begin your free trial.
+    Your nature-based preventive wellness guide. Sign in to begin your free trial.
   </p>
 
   <!-- Magic Link Login -->
-  <input id="magic-email" type="email" placeholder="Enter your email" />
+  <input id="magic-email" type="email" placeholder="Enter your email" autocomplete="email" />
   <button id="send-magic-btn">Send One-Time Login Link</button>
 
   <div class="divider">OR</div>
@@ -35,6 +34,7 @@
   <!-- Google Login -->
   <button id="google-btn" class="google-btn">
     <span class="google-icon">
+      <!-- Google SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
         <path fill="#EA4335"
           d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.89 2.54 30.47 0 24 0 14.8 0 6.83 5.71 2.84 13.89l7.98 6.19C12.76 14.01 17.92 9.5 24 9.5z" />
@@ -53,52 +53,51 @@
 
 
 
-  <!-- 🌿 MAIN CHAT APP -->
-  <div id="chat-app" style="display:none;">
+<!-- 🌿 MAIN CHAT APP -->
+<div id="chat-app" style="display:none;">
 
-    <!-- HEADER -->
-    <div class="header">
-
-      <div class="header-content">
-        <div class="avatar"></div>
-        <div class="title">Nani-AI</div>
-        <div class="subtitle">Your Natural Wellness Guide</div>
-      </div>
-
-      <button id="account-btn" class="account-btn">Account</button>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-content">
+      <div class="avatar"></div>
+      <div class="title">Nani-AI</div>
+      <div class="subtitle">Your Natural Wellness Guide</div>
     </div>
 
-    <!-- CHAT BODY -->
-    <div class="container">
-      <div id="nani-chat-box"></div>
-
-      <div class="input-row">
-        <input id="nani-input" placeholder="What are you suffering from?" />
-        <button id="nani-send-btn">Send</button>
-      </div>
-
-      <!-- 🌿 OPTIONAL Soft Upgrade Banner -->
-	  <div id="upgrade-banner" class="upgrade-banner hidden">
-		✨ Enjoying Nani-AI? Unlock full access — <span id="upgrade-link">Subscribe</span>
-	  </div>
-
-      <div id="trial-expired" class="expired-box hidden">
-        <h3>Your free trial has ended</h3>
-        <p>Subscribe to continue using Nani-AI.</p>
-        <button id="subscribe-btn">Subscribe</button>
-      </div>
-    </div>
+    <button id="account-btn" class="account-btn">Account</button>
   </div>
 
+  <!-- CHAT BODY -->
+  <div class="container">
+    <div id="nani-chat-box"></div>
 
-  <!-- 🌿 ACCOUNT PANEL MODAL -->
+    <div class="input-row">
+      <input id="nani-input" placeholder="What are you suffering from?" />
+      <button id="nani-send-btn">Send</button>
+    </div>
+
+    <!-- Soft Upgrade Banner -->
+    <div id="upgrade-banner" class="upgrade-banner hidden">
+      ✨ Enjoying Nani-AI? Unlock full access — <span id="upgrade-link">Subscribe</span>
+    </div>
+
+    <!-- Trial Expired Notice -->
+    <div id="trial-expired" class="expired-box hidden">
+      <h3>Your free trial has ended</h3>
+      <p>Subscribe to continue using Nani-AI.</p>
+      <button id="subscribe-btn">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- 🌿 ACCOUNT PANEL MODAL -->
 <div id="account-panel" class="account-panel hidden">
   <div class="panel-content">
 
     <h2>Your Account</h2>
 
-    <!-- Role badge -->
     <div class="role-row">
       <span class="role-badge" id="acc-role-badge">Free</span>
     </div>
@@ -108,18 +107,20 @@
     <p><strong>Days Left:</strong> <span id="acc-days-left">—</span></p>
     <p><strong>Subscription:</strong> <span id="acc-sub-status">—</span></p>
 
-    <!-- Upgrade options -->
+    <!-- Upgrade block -->
     <div id="acc-upgrade-block">
       <p><strong>Upgrade to Nani-AI Premium:</strong></p>
+
       <button id="acc-upgrade-monthly" class="subscribe-btn">
         🌿 Unlock Monthly – $9.99
       </button>
+
       <button id="acc-upgrade-annual" class="subscribe-btn outline">
         ✨ Unlock Annual – $79 (Best Value)
       </button>
     </div>
 
-    <!-- Manage billing (only when subscribed) -->
+    <!-- Only visible for subscribed users -->
     <button id="manage-billing-btn" class="subscribe-btn hidden">
       Manage Billing
     </button>
@@ -127,11 +128,37 @@
     <!-- Actions -->
     <button id="acc-logout-btn" class="logout-btn">Sign Out</button>
     <button id="acc-close" class="close-btn">Close</button>
+
   </div>
 </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/src/app.js"></script>
+
+
+<!-- 🌿 SUBSCRIPTION CHOICE MODAL -->
+<div id="subscribe-modal" class="subscribe-modal hidden">
+  <div class="subscribe-modal-content">
+
+    <h2>Choose Your Nani-AI Plan</h2>
+    <p>Select a plan to unlock full access</p>
+
+    <button id="sub-monthly" class="subscribe-btn">
+      🌿 Monthly – $9.99
+    </button>
+
+    <button id="sub-annual" class="subscribe-btn outline">
+      ✨ Annual – $79 (Best Value)
+    </button>
+
+    <button id="sub-cancel" class="close-btn">Cancel</button>
+
+  </div>
+</div>
+
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="/src/app.js"></script>
+
 </body>
 </html>

@@ -23,6 +23,7 @@ button {
   cursor: pointer;
   font-family: inherit;
   box-sizing: border-box;
+  transition: background 0.2s ease;
 }
 
 /* -------------------------------------------------
@@ -39,13 +40,14 @@ button {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .welcome-title {
   font-size: 1.9rem;
   font-weight: bold;
   color: #0d8f8f;
+  margin-bottom: 8px;
 }
 
 .welcome-subtitle {
@@ -55,42 +57,42 @@ button {
   line-height: 1.5;
 }
 
-#welcome-screen input,
-#welcome-screen button {
+#welcome-screen input {
   width: 100%;
   padding: 14px;
   border-radius: 10px;
   border: 1px solid #bcdcdc;
-  box-sizing: border-box;
   margin-bottom: 12px;
   font-size: 1rem;
 }
 
-/* Magic Link Button */
 #send-magic-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
   background: #14A1A1;
   color: white;
-  border: none;
 }
 
 #send-magic-btn:hover {
   background: #0e7f7f;
 }
 
-/* Google Login Button */
+/* Google Button */
 .google-btn {
   width: 100%;
   padding: 14px;
-  background: white;
-  border: 1px solid #ccc;
   border-radius: 10px;
-  margin-top: 12px;
+  border: 1px solid #ccc;
+  background: white;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   font-size: 1rem;
-  box-sizing: border-box;
+  margin-top: 14px;
 }
 
 .google-btn:hover {
@@ -100,7 +102,6 @@ button {
 .google-icon svg {
   width: 20px;
   height: 20px;
-  display: block;
 }
 
 .divider {
@@ -108,6 +109,7 @@ button {
   font-size: 0.9rem;
   color: #888;
 }
+
 
 /* -------------------------------------------------
    HEADER
@@ -207,6 +209,7 @@ button {
   100% { opacity: 0.2; transform: translateY(0); }
 }
 
+
 /* -------------------------------------------------
    CHAT MESSAGES
 -------------------------------------------------- */
@@ -227,6 +230,7 @@ button {
   background: #e3f8f8;
   color: #0a3d3d;
 }
+
 
 /* -------------------------------------------------
    INPUT ROW
@@ -252,6 +256,7 @@ button {
   border: none;
 }
 
+
 /* -------------------------------------------------
    TRIAL EXPIRED BOX
 -------------------------------------------------- */
@@ -268,6 +273,7 @@ button {
   color: #c07a00;
 }
 
+
 /* -------------------------------------------------
    ACCOUNT PANEL
 -------------------------------------------------- */
@@ -281,6 +287,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 50;
 }
 
 .panel-content {
@@ -292,7 +299,6 @@ button {
   color: #0a3d3d;
 }
 
-/* Buttons inside account panel */
 .subscribe-btn {
   width: 100%;
   padding: 12px;
@@ -358,6 +364,7 @@ button {
 .role-badge.trial { background: #e3f2fd; color: #1565c0; }
 .role-badge.free { background: #e0e0e0; color: #424242; }
 
+
 /* -------------------------------------------------
    UPGRADE BANNER
 -------------------------------------------------- */
@@ -379,6 +386,43 @@ button {
   text-decoration: underline;
 }
 
+
+/* -------------------------------------------------
+   SUBSCRIPTION MODAL
+-------------------------------------------------- */
+.subscribe-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 60;
+}
+
+.subscribe-modal-content {
+  background: white;
+  width: 90%;
+  max-width: 360px;
+  padding: 22px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.subscribe-modal-content h2 {
+  margin-top: 0;
+  color: #0d8f8f;
+}
+
+.subscribe-modal-content p {
+  color: #116666;
+  margin-bottom: 18px;
+}
+
+
 /* -------------------------------------------------
    DARK MODE
 -------------------------------------------------- */
@@ -397,4 +441,16 @@ button {
 
   .typing-indicator { background: #203544; }
   .typing-dots div { background: #9cebbf; }
+
+  .panel-content,
+  .subscribe-modal-content {
+    background: #1c2c38;
+    color: #e8fbfb;
+  }
+
+  .subscribe-btn.outline {
+    background: transparent;
+    border-color: #14A1A1;
+    color: #14A1A1;
+  }
 }
