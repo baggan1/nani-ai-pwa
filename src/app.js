@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const accLogoutBtn = document.getElementById("acc-logout-btn");
   const trialExpiredBox = document.getElementById("trial-expired");
 
-  const STRIPE_MONTHLY_PRICE_ID = "price_1SWMZ5HrqVgKycWRnBd7IGOU";
-  const STRIPE_ANNUAL_PRICE_ID = "price_1SWMZ5HrqVgKycWReCV3aCmM";
+  const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
+  const STRIPE_ANNUAL_PRICE_ID = "price_1SWNgmQZiiSZQI7eSqTsjwhm";
 
 
   // -----------------------------------------------
