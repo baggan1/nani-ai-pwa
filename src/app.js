@@ -45,10 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
   const accUpgradeAnnual = document.getElementById("acc-upgrade-annual");
   const manageBillingBtn = document.getElementById("manage-billing-btn");
- // const historyToggleBtn = document.getElementById("history-toggle-btn");
- // const historyPanel = document.getElementById("history-panel");
- // const historyList = document.getElementById("history-list");
- // const historyEmpty = document.getElementById("history-empty");
   const accLogoutBtn = document.getElementById("acc-logout-btn");
   const trialExpiredBox = document.getElementById("trial-expired");
 
@@ -356,65 +352,6 @@ function updateSubscriptionUI(info) {
 	localStorage.clear();
 	window.location.href = "/"; // Redirects to login screen
   });
-
- //-------------------------------------
- //History Toggle +fetch ---------------
- //-------------------------------------
-/*let historyLoaded = false;
-
-historyToggleBtn.addEventListener("click", async () => {
-  if (historyPanel.classList.contains("hidden")) {
-    historyPanel.classList.remove("hidden");
-    historyToggleBtn.textContent = "Hide Wellness History";
-    if (!historyLoaded) {
-      await loadHistory();
-      historyLoaded = true;
-    }
-  } else {
-    historyPanel.classList.add("hidden");
-    historyToggleBtn.textContent = "View Wellness History";
-  }
-});
-
-async function loadHistory() {
-  if (!accessToken) {
-    historyEmpty.classList.remove("hidden");
-    historyEmpty.textContent = "Please sign in to view your history.";
-    return;
-  }
-
-  try {
-    const res = await fetch("https://naturopathy.onrender.com/user/history", {
-      headers: {
-        "X-API-KEY": API_SECRET,
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
-
-    const data = await res.json();
-
-    historyList.innerHTML = "";
-    if (!Array.isArray(data) || data.length === 0) {
-      historyEmpty.classList.remove("hidden");
-      return;
-    }
-
-    historyEmpty.classList.add("hidden");
-
-    data.forEach(item => {
-      const li = document.createElement("li");
-      const dt = new Date(item.created_at || item.createdAt || Date.now());
-      const timeStr = dt.toLocaleString();
-      li.textContent = `${item.query}  —  ${timeStr}`;
-      historyList.appendChild(li);
-    });
-  } catch (err) {
-    console.error("History load error", err);
-    historyEmpty.classList.remove("hidden");
-    historyEmpty.textContent = "Could not load history.";
-  }
-}
-*/
 
 //-----------------------------------------------
 //SIGN-OUT----------------------------------------

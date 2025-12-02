@@ -1,6 +1,6 @@
-/* ------------------------------------------
+/* -------------------------------------------------
    GLOBAL
-------------------------------------------- */
+-------------------------------------------------- */
 body {
   margin: 0;
   padding: 0;
@@ -19,9 +19,15 @@ body {
   padding: 20px;
 }
 
-/* ------------------------------------------
+button {
+  cursor: pointer;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------
    WELCOME SCREEN
-------------------------------------------- */
+-------------------------------------------------- */
 .welcome-screen {
   text-align: center;
   padding: 50px 20px;
@@ -49,43 +55,42 @@ body {
   line-height: 1.5;
 }
 
-#welcome-screen input {
+#welcome-screen input,
+#welcome-screen button {
   width: 100%;
-  display: block;
   padding: 14px;
   border-radius: 10px;
   border: 1px solid #bcdcdc;
-  margin-bottom: 12px;
   box-sizing: border-box;
+  margin-bottom: 12px;
+  font-size: 1rem;
 }
 
-#welcome-screen button {
-  width: 100%;
-  display: block;
-  padding: 14px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: none;
+/* Magic Link Button */
+#send-magic-btn {
   background: #14A1A1;
   color: white;
-  cursor: pointer;
-  margin-bottom: 12px;
-  box-sizing: border-box;
+  border: none;
 }
 
+#send-magic-btn:hover {
+  background: #0e7f7f;
+}
+
+/* Google Login Button */
 .google-btn {
   width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding: 14px;
   background: white;
-  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-top: 12px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 10px;
-  cursor: pointer;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
 .google-btn:hover {
@@ -93,6 +98,8 @@ body {
 }
 
 .google-icon svg {
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
@@ -102,9 +109,9 @@ body {
   color: #888;
 }
 
-/* ------------------------------------------
+/* -------------------------------------------------
    HEADER
-------------------------------------------- */
+-------------------------------------------------- */
 .header {
   position: relative;
   background: #f0fdfa;
@@ -149,12 +156,11 @@ body {
   color: white;
   font-size: 0.9rem;
   border: none;
-  cursor: pointer;
 }
 
-/* ------------------------------------------
+/* -------------------------------------------------
    CHAT BOX
-------------------------------------------- */
+-------------------------------------------------- */
 #nani-chat-box {
   height: 420px;
   overflow-y: auto;
@@ -165,9 +171,9 @@ body {
   margin-bottom: 20px;
 }
 
-/* ------------------------------------------
-   TYPING BUBBLE
-------------------------------------------- */
+/* -------------------------------------------------
+   TYPING INDICATOR
+-------------------------------------------------- */
 .typing-indicator {
   display: flex;
   align-items: center;
@@ -177,7 +183,6 @@ body {
   width: fit-content;
   margin: 8px 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  font-size: 14px;
 }
 
 .typing-dots {
@@ -188,17 +193,13 @@ body {
 .typing-dots div {
   width: 8px;
   height: 8px;
-  background: #6dbb75; /* leaf green */
+  background: #6dbb75;
   border-radius: 50%;
   animation: typing 1s infinite ease-in-out;
 }
 
-.typing-dots div:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.typing-dots div:nth-child(3) {
-  animation-delay: 0.4s;
-}
+.typing-dots div:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots div:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typing {
   0% { opacity: 0.2; transform: translateY(0); }
@@ -206,289 +207,4 @@ body {
   100% { opacity: 0.2; transform: translateY(0); }
 }
 
-/* ------------------------------------------
-   CHAT MESSAGES
-------------------------------------------- */
-.msg-user .bubble,
-.msg-nani .bubble {
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  white-space: pre-wrap;
-}
-
-.msg-user .bubble {
-  background: #d4f7e2;
-  color: #0a3d3d;
-}
-
-.msg-nani .bubble {
-  background: #e3f8f8;
-  color: #0a3d3d;
-}
-
-/* ------------------------------------------
-   INPUT ROW
-------------------------------------------- */
-.input-row {
-  display: flex;
-  gap: 8px;
-}
-
-#nani-input {
-  flex: 1;
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: 1px solid #bcdcdc;
-}
-
-#nani-send-btn {
-  padding: 12px 16px;
-  background: #14A1A1;
-  color: white;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-/* ------------------------------------------
-   TRIAL EXPIRED BOX
-------------------------------------------- */
-.expired-box {
-  background: #fff4d9;
-  border: 1px solid #ffe6b3;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.expired-box h3 {
-  margin: 0 0 10px;
-  color: #c07a00;
-}
-
-/* ------------------------------------------
-   ACCOUNT PANEL
-------------------------------------------- */
-.account-panel {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(6px);
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.panel-content {
-  background: white;
-  width: 90%;
-  max-width: 380px;
-  border-radius: 14px;
-  padding: 20px;
-  color: #0a3d3d;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
-}
-
-.subscribe-btn,
-.close-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  border-radius: 10px;
-  border: none;
-}
-
-.subscribe-btn {
-  background: #14A1A1;
-  color: white;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-}
-
-.subscribe-btn:hover {
-  background: #0f8080;
-}
-
-.close-btn {
-  background: #ddd;
-  color: #333;
-}
-
-
-/* ------------------------------------------
-   UPGRADE BANNER
-------------------------------------------- */
-.upgrade-banner {
-  background: #e4faf5;
-  border: 1px solid #b6e3d9;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin-bottom: 18px;
-  text-align: center;
-  color: #0c6b6b;
-  font-size: 0.95rem;
-}
-
-.upgrade-banner span {
-  font-weight: bold;
-  cursor: pointer;
-  color: #0d8f8f;
-  text-decoration: underline;
-}
-
-.upgrade-banner span:hover {
-  color: #0a5353;
-}
-
-.role-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-.role-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: #e0f7f7;
-  color: #0d8f8f;
-  text-transform: uppercase;
-}
-
-.role-badge.premium {
-  background: #ffe9b3;
-  color: #b87400;
-}
-
-.role-badge.trial {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.role-badge.free {
-  background: #e0e0e0;
-  color: #424242;
-}
-
-.subscribe-btn.outline {
-  background: white;
-  color: #14A1A1;
-  border: 1px solid #14A1A1;
-}
-
-/*
-.history-toggle {
-  margin-top: 16px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #cde4e4;
-  background: #f5fbfb;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.history-panel {
-  margin-top: 10px;
-  max-height: 220px;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid #e1eeee;
-  padding: 8px 10px;
-  background: #ffffff;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.history-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.history-list li {
-  font-size: 0.9rem;
-  padding: 6px 0;
-  border-bottom: 1px solid #eef4f4;
-}
-
-.history-list li:last-child {
-  border-bottom: none;
-}
-
-.history-empty {
-  font-size: 0.9rem;
-  color: #777;
-}
-*/
-
-.logout-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #c94a4a;
-  color: white;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: #a83c3c;
-}
-
-
-/* ------------------------------------------
-   DARK MODE
-------------------------------------------- */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #0f1b26;
-    color: #e7f5f5;
-  }
-
-  .header {
-    background: #14212e;
-  }
-
-  #nani-chat-box {
-    background: #13222e;
-    border-color: #204458;
-  }
-
-  .msg-user .bubble {
-    background: #1e3a4a;
-    color: #dceff0;
-  }
-
-  .msg-nani .bubble {
-    background: #26485d;
-    color: #e8fbfb;
-  }
-
-  #nani-input {
-    background: #10202c;
-    color: #e8fbfb;
-  }
-
-  #nani-send-btn {
-    background: #158b8b;
-  }
-
-  /* Optional dark-mode typing bubble polish */
-  .typing-indicator {
-    background: #203544;
-    box-shadow: none;
-  }
-
-  .typing-dots div {
-    background: #9cebbf;
-  }
-}
+/* -----------------------------------------------*
