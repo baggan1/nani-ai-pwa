@@ -150,14 +150,21 @@ button {
 }
 
 /* -------------------------------------------------
-   TYPING INDICATOR
+   TYPING INDICATOR — THINKING BUBBLES
 -------------------------------------------------- */
 .typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: #f0f5f0;
   padding: 10px 14px;
   border-radius: 12px;
   width: fit-content;
   margin: 8px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.typing-dots {
   display: flex;
   gap: 6px;
 }
@@ -165,14 +172,19 @@ button {
 .typing-dots div {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   background: #6dbb75;
-  animation: typing 1s infinite ease-in-out;
+  border-radius: 50%;
+  animation: typingBlink 1.4s infinite ease-in-out;
 }
 
-@keyframes typing {
-  50% { opacity: 1; transform: translateY(-2px); }
+.typing-dots div:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots div:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBlink {
+  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
 }
+
 
 /* -------------------------------------------------
    CHAT MESSAGES
@@ -322,4 +334,87 @@ button {
   max-width: 360px;
   border-radius: 14px;
   text-align: center;
+}
+
+/* -------------------------------------------------
+   DARK MODE (Restored + Improved)
+-------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0f1b26;
+    color: #e7f5f5;
+  }
+
+  .welcome-screen { background: #0f1b26; }
+  #welcome-screen input {
+    background: #12222f;
+    border-color: #305060;
+    color: #e7f5f5;
+  }
+  #welcome-screen button {
+    background: #158b8b;
+    color: white;
+    border: none;
+  }
+
+  .google-btn { 
+    background: #1a2a35; 
+    border-color: #304858;
+    color: #e7f5f5;
+  }
+  .google-btn:hover { background: #223643; }
+
+  .header { background: #14212e; border-bottom-color: #203544; }
+
+  #nani-chat-box { 
+    background: #13222e; 
+    border-color: #204458;
+    color: #e7f5f5;
+  }
+
+  .msg-user .bubble { background: #1e3a4a; color: #dceff0; }
+  .msg-nani .bubble { background: #26485d; color: #e8fbfb; }
+
+  #nani-input {
+    background: #10202c;
+    border-color: #203c50;
+    color: #e8fbfb;
+  }
+
+  #nani-send-btn { background: #158b8b; color: white; }
+
+  .upgrade-banner {
+    background: #1e3b32;
+    border-color: #24584a;
+    color: #c3f0e2;
+  }
+
+  .expired-box {
+    background: #4a3714;
+    border-color: #7a5a2b;
+    color: #ffdba3;
+  }
+
+  .panel-content { 
+    background: #14222d; 
+    color: #e7f5f5; 
+  }
+
+  .subscribe-btn {
+    background: #158b8b;
+    color: white;
+  }
+
+  .subscribe-btn.outline {
+    background: transparent;
+    color: #65d7d7;
+    border-color: #65d7d7;
+  }
+
+  .close-btn { background: #2d3f4c; color: #d6e6eb; }
+
+  .logout-btn { background: #a83c3c; color: white; }
+
+  .typing-indicator { background: #203544; }
+  .typing-dots div { background: #9cebbf; }
 }
