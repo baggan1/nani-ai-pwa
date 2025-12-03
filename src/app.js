@@ -1,6 +1,6 @@
 /***************************************************
  * NANI-AI PWA (Supabase Auth + Automatic Trial)
- * Final Version — Unified Modal Subscription Flow
+ * Conversational Version — Sends Short History
  ***************************************************/
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -69,6 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let userEmail = null;
   let typingBubble = null;
 
+  // Short in-browser conversation memory:
+  // [{ role: "user" | "assistant", content: string }, ...]
+  let conversationHistory = [];
+
+
   // -----------------------------------------------
   // HELPERS
   // -----------------------------------------------
@@ -118,6 +123,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       accRoleBadge.textContent = "Free";
       accRoleBadge.classList.add("free");
+    }
+  }
+
+  // Keep last few turns only (to avoid huge payloads)
+  function addToHistory(sender, text) {
+    conversationHistory.push({ role: sender === "user" ? "user" : "assistant", content: text });
+    if (conversationHistory.length > 8) {
+      conversationHistory = conversationHistory.slice(-8);
     }
   }
 
@@ -361,13 +374,14 @@ document.addEventListener("DOMContentLoaded", () => {
   accLogoutBtn.addEventListener("click", async () => {
     await sb.auth.signOut();
     localStorage.clear();
+    conversationHistory = []; // reset conversation on logout
     showScreen(false);
     accountPanel.classList.add("hidden");
   });
 
 
   // -----------------------------------------------
-  // SEND MESSAGE → NANI
+  // SEND MESSAGE → NANI (CONVERSATIONAL)
   // -----------------------------------------------
   async function sendToNani() {
     const query = inputField.value.trim();
@@ -378,8 +392,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Show user bubble
     appendMessage("user", query);
     inputField.value = "";
+
+    // For this request, send ONLY previous turns.
+    // We'll append this new Q + response to history AFTER the call.
+    const historyPayload = conversationHistory.slice();
 
     showTyping();
 
@@ -394,7 +413,8 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           query,
           match_threshold: 0.4,
-          match_count: 3
+          match_count: 3,
+          history: historyPayload
         })
       });
 
@@ -405,6 +425,10 @@ document.addEventListener("DOMContentLoaded", () => {
         appendMessage("nani", "⚠️ " + data.error);
       } else {
         appendMessage("nani", data.summary);
+
+        // Now that round-trip is done, update conversation memory
+        addToHistory("user", query);
+        addToHistory("assistant", data.summary);
       }
 
     } catch (err) {
