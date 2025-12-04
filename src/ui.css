@@ -62,6 +62,17 @@ button {
   font-size: 1rem;
 }
 
+/* Ensure email input + magic link button + Google button match width */
+.welcome-screen input,
+.welcome-screen button,
+.welcome-screen .google-btn {
+  width: 100%;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
 /* Magic Link */
 #send-magic-btn {
   background: #14A1A1;
