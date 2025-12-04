@@ -72,6 +72,25 @@ button {
   margin-right: auto;
 }
 
+/* Ensures email input + both buttons match width perfectly */
+.welcome-form-group {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.welcome-form-group input,
+.welcome-form-group button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.welcome-form-group .divider {
+  text-align: center;
+  margin: 12px 0;
+}
+
+
 
 /* Magic Link */
 #send-magic-btn {
