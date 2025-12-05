@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------------
   // ENV VARS (Vite → Vercel)
   // -----------------------------------------------
-  const API_SECRET = "gR4k#82GJ!nani2025";
-  const SUPABASE_URL = "https://biblbpmlpchztyifoypt.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpYmxicG1scGNoenR5aWZveXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODUxMjksImV4cCI6MjA3OTE2MTEyOX0.qmwrUIvkhjp7jB2Tb9E5ORQZPHVLyirjmhPe3tr9Lbk";
-
+  const API_SECRET = import.meta.env.VITE_API_SECRET;
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+  
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Stripe Price IDs (PRODUCTION)
