@@ -2,7 +2,6 @@
  * NANI PWA (Supabase Auth + Automatic Trial)
  * Conversational Version — Sends Short History
  ***************************************************/
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -13,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_URL = "https://biblbpmlpchztyifoypt.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpYmxicG1scGNoenR5aWZveXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODUxMjksImV4cCI6MjA3OTE2MTEyOX0.qmwrUIvkhjp7jB2Tb9E5ORQZPHVLyirjmhPe3tr9Lbk";
 
-  //const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Stripe Price IDs (PRODUCTION)
   const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
