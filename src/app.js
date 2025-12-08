@@ -191,18 +191,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const { data } = await sb.auth.getSession();
 
     if (data.session) {
-      session = data.session;
-      accessToken = session.access_token;
-      userEmail = session.user.email;
+		session = data.session;
+		accessToken = session.access_token;
+		userEmail = session.user.email;
 
-      localStorage.setItem("nani_access_token", accessToken);
-      localStorage.setItem("nani_user_email", userEmail);
+		localStorage.setItem("nani_access_token", accessToken);
+		localStorage.setItem("nani_user_email", userEmail);
 
-      showScreen(true);
-    } else {
-      showScreen(false);
-    }
-  }
+	try {
+		await loadUserContext();   // ✅ ADD THIS
+		showScreen(true);
+	} catch (e) {
+		console.error("Session bootstrap failed", e);
+		showScreen(false);
+	}
+  }	
+ }
 
   loadSession();
 
