@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
   
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  window.sb = sb;   //  <-- Add this for debugging
-
 
   // Stripe Price IDs (PRODUCTION)
   const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
