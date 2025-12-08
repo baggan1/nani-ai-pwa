@@ -206,6 +206,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadSession();
 
+// -----------------------------------------------
+// LOAD USER CONTEXT (RLS-SAFE BOOTSTRAP)
+// -----------------------------------------------
+	async function loadUserContext() {
+	// Ensure session is valid
+	const { data: { user }, error: userErr } = await sb.auth.getUser();
+	if (userErr || !user) throw userErr || new Error("No auth user");
+
+	// 1️⃣ Load profile
+	const { data: profile, error: profileErr } =
+		await sb.from("profiles").select("*").single();
+
+	if (profileErr) {
+		console.error("Profile RLS error", profileErr);
+		throw profileErr;
+	}
+
+	// 2️⃣ Load user access (if you use this table)
+	const { data: access, error: accessErr } =
+		await sb.from("user_access").select("*").single();
+
+	if (accessErr) {
+		console.error("User access RLS error", accessErr);
+		throw accessErr;
+	}
+
+  // 3️⃣ Store globally (safe + debuggable)
+  window.userProfile = profile;
+  window.userAccess = access;
+
+  console.log("✅ User context loaded", { profile, access });
+}
+
 
   // -----------------------------------------------
   // AUTH: MAGIC LINK
@@ -245,17 +278,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------------
   // AUTH STATE CHANGE
   // -----------------------------------------------
-  sb.auth.onAuthStateChange((_event, newSession) => {
-    if (newSession) {
-      session = newSession;
-      accessToken = newSession.access_token;
-      userEmail = newSession.user.email;
+  sb.auth.onAuthStateChange(async (_event, newSession) => {
+	if (!newSession) return;
 
-      localStorage.setItem("nani_access_token", accessToken);
-      localStorage.setItem("nani_user_email", userEmail);
-      showScreen(true);
-    }
-  });
+		session = newSession;
+		accessToken = newSession.access_token;
+		userEmail = newSession.user.email;
+
+		localStorage.setItem("nani_access_token", accessToken);
+		localStorage.setItem("nani_user_email", userEmail);
+
+	try {
+		await loadUserContext();   // ✅ NEW
+		showScreen(true);
+	} catch (err) {
+		console.error("Auth bootstrap failed", err);
+		alert("Something went wrong loading your account. Please refresh.");
+	}
+ });
 
 
   // -----------------------------------------------
