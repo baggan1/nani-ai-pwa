@@ -205,7 +205,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		console.error("Session bootstrap failed", e);
 		showScreen(false);
 	}
-  }	
+  }
+	
  }
 
   loadSession();
@@ -213,28 +214,29 @@ document.addEventListener("DOMContentLoaded", () => {
 // -----------------------------------------------
 // LOAD USER CONTEXT (RLS-SAFE BOOTSTRAP)
 // -----------------------------------------------
-	async function loadUserContext() {
-	// Ensure session is valid
-	const { data: { user }, error: userErr } = await sb.auth.getUser();
-	if (userErr || !user) throw userErr || new Error("No auth user");
+  async function loadUserContext() {
+	if (!accessToken) throw new Error("Missing access token");
 
-	// 1️⃣ Load profile
-	const { data: profile, error: profileErr } =
-		await sb.from("profiles").select("*").single();
+	const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+	 headers: {
+		"X-API-KEY": API_SECRET,
+		"Authorization": `Bearer ${accessToken}`
+	 }
+    });
 
-	if (profileErr) {
-		console.error("Profile RLS error", profileErr);
-		throw profileErr;
+	if (!res.ok) {
+		throw new Error("Auth status failed");
 	}
 
-	// 2️⃣ Load user access (if you use this table)
-	const { data: access, error: accessErr } =
-		await sb.from("user_access").select("*").single();
+	const info = await res.json();
 
-	if (accessErr) {
-		console.error("User access RLS error", accessErr);
-		throw accessErr;
-	}
+	accEmail.textContent = userEmail;
+	setRoleBadge(info.role);
+	updateSubscriptionUI(info);
+
+	return info;
+  }
+
 
   // 3️⃣ Store globally (safe + debuggable)
   window.userProfile = profile;
