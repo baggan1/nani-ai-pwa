@@ -1,5 +1,5 @@
 /***************************************************
- * NANI PWA (Supabase Auth + Automatic Trial)
+ * NANI-AI PWA (Supabase Auth + Automatic Trial)
  * Conversational Version — Sends Short History
  ***************************************************/
 

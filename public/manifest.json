@@ -1,6 +1,6 @@
 {
-  "name": "Nani Wellness Assistant",
-  "short_name": "Nani",
+  "name": "Nani-AI Wellness Assistant",
+  "short_name": "Nani-AI",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f0fdfa",
