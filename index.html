@@ -60,22 +60,19 @@
 
 
 
-<!-- 🌿 MAIN APP -->
-<div id="chat-app" style="display:none;">
-
-  <!-- HEADER -->
+<!-- 🌿 MAIN CHAT APP -->
+<!-- Main Chat App -->
+<div id="chat-app" class="hidden" style="display:flex; flex-direction:column; height:100vh;">
   <div class="header">
     <div class="header-content">
       <div class="avatar"></div>
       <div class="title">Nani-AI</div>
       <div class="subtitle">Your Natural Wellness Guide</div>
     </div>
-
     <button id="account-btn" class="account-btn">Account</button>
   </div>
 
   <div class="container">
-
     <div id="nani-chat-box"></div>
 
     <div class="input-row">
@@ -83,21 +80,18 @@
       <button id="nani-send-btn">Send</button>
     </div>
 
-    <!-- Soft upgrade banner -->
     <div id="upgrade-banner" class="upgrade-banner hidden">
-      ✨ Enjoying Nani-AI? Unlock full access —
-      <span id="upgrade-link">Subscribe</span>
+      ✨ Enjoying Nani-AI? Unlock full access — <span id="upgrade-link">Subscribe</span>
     </div>
 
-    <!-- Trial expired hard block -->
     <div id="trial-expired" class="expired-box hidden">
       <h3>Your free trial has ended</h3>
       <p>Subscribe to continue using Nani-AI.</p>
       <button id="subscribe-btn">Subscribe</button>
     </div>
-
   </div>
 </div>
+
 
 
 <!-- 🌿 ACCOUNT PANEL -->
