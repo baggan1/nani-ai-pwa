@@ -215,8 +215,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  sb.auth.onAuthStateChange((_event, newSession) => {
+ /* sb.auth.onAuthStateChange((_event, newSession) => {
     if (newSession) bootstrapUser();
+  }); */
+  
+  sb.auth.onAuthStateChange((_event, session) => {
+	if (!session) return;
+
+	console.log("Auth timestamps:", {
+	 created_at: session.user.created_at,
+     last_sign_in_at: session.user.last_sign_in_at,
+     expires_at: session.expires_at,
+    });
   });
 
   // -----------------------------------------------
