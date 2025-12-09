@@ -60,6 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const subAnnualBtn     = document.getElementById("sub-annual");
   const subCancelBtn     = document.getElementById("sub-cancel");
 
+  const accUpgradeBlock   = document.getElementById("acc-upgrade-block");
+  const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
+  const accUpgradeAnnual  = document.getElementById("acc-upgrade-annual");
+
   // -----------------------------------------------
   // STATE
   // -----------------------------------------------
@@ -126,6 +130,20 @@ Ask me about lifestyle, diet, or wellness tips to get started.
                                role === "trial"   ? "Trial" : "Free";
   }
 
+  function updateUpgradeUI(info) {
+    if (info.subscribed) {
+        // Premium users: hide upgrade buttons
+        accUpgradeBlock?.classList.add("hidden");
+        // But keep manage billing visible
+        manageBillingBtn.classList.remove("hidden");
+    } else {
+        // Free or trial users: show upgrade buttons
+        accUpgradeBlock?.classList.remove("hidden");
+        // Hide manage billing if not subscribed
+        manageBillingBtn.classList.add("hidden");
+    }
+  }
+  
   function updateSubscriptionUI(info) {
     accEmail.textContent       = userEmail;
     accSubStatus.textContent   = info.subscribed ? "Premium Active" :
@@ -143,7 +161,9 @@ Ask me about lifestyle, diet, or wellness tips to get started.
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.remove("hidden");
     }
+	updateUpgradeUI(info);
   }
+
 
   // -----------------------------------------------
   // 🔐 BOOTSTRAP USER
@@ -243,6 +263,15 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     showScreen(false);
     accountPanel.classList.add("hidden");
   };
+  accUpgradeMonthly?.addEventListener("click", () => {
+    if (!session || !session.user) return alert("Please log in to subscribe");
+    startCheckout(STRIPE_MONTHLY_PRICE_ID);
+  });
+
+  accUpgradeAnnual?.addEventListener("click", () => {
+    if (!session || !session.user) return alert("Please log in to subscribe");
+    startCheckout(STRIPE_ANNUAL_PRICE_ID);
+  });
 
   // -----------------------------------------------
   // SUBSCRIPTION MODAL
