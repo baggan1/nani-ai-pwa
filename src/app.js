@@ -131,6 +131,29 @@ document.addEventListener("DOMContentLoaded", () => {
     if (conversationHistory.length > 8) conversationHistory = conversationHistory.slice(-8);
   }
 
+// ----------------------------
+// INITIAL CHAT MESSAGE
+// ----------------------------
+  function showInitialMessage() {
+	const welcomeText = `
+  🌿 Hello! I'm Nani, your natural wellness guide.
+  Ask me about lifestyle, diet, or wellness tips to get started.
+	`;
+	appendMessage("nani", welcomeText);
+	addToHistory("assistant", welcomeText);
+  }
+
+// ----------------------------
+// ENHANCED TYPING INDICATOR
+// ----------------------------
+  function showTypingIndicator(duration = 1000) {
+	showTyping();
+	return new Promise(resolve => setTimeout(() => {
+		hideTyping();
+		resolve();
+	}, duration));
+  }
+
   // -----------------------------------------------
   // SUBSCRIPTION UI
   // -----------------------------------------------
@@ -163,45 +186,46 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------------
   // 🔐 BOOTSTRAP USER (KEY FIX)
   // -----------------------------------------------
-  async function bootstrapUser() {
-    try {
-      const { data } = await sb.auth.getSession();
-      if (!data?.session) {
-        console.log("No session found, showing welcome screen.");
-        showScreen(false);
-        return;
-      }
-
-      session = data.session;
-      accessToken = session.access_token;
-      userEmail = session.user.email;
-
-      localStorage.setItem("nani_access_token", accessToken);
-      localStorage.setItem("nani_user_email", userEmail);
-
-      console.log("Session found for user:", userEmail);
-
-      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-        headers: {
-          "X-API-KEY": API_SECRET,
-          "Authorization": `Bearer ${accessToken}`
-        }
-      });
-
-      if (!res.ok) throw new Error("auth/status failed");
-
-      const info = await res.json();
-      accEmail.textContent = userEmail;
-      setRoleBadge(info.role);
-      updateSubscriptionUI(info);
-      showScreen(true);
-
-    } catch (err) {
-      console.error("Bootstrap failed", err);
-      showScreen(true); // fail open instead of blank screen
-    }
+ async function bootstrapUser() {
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    showScreen(false);
+    return;
   }
 
+  session = data.session;
+  accessToken = session.access_token;
+  userEmail = session.user.email;
+
+  localStorage.setItem("nani_access_token", accessToken);
+  localStorage.setItem("nani_user_email", userEmail);
+
+  try {
+    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+      headers: {
+        "X-API-KEY": API_SECRET,
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    if (!res.ok) throw new Error("auth/status failed");
+
+    const info = await res.json();
+    accEmail.textContent = userEmail;
+    setRoleBadge(info.role);
+    updateSubscriptionUI(info);
+    showScreen(true);
+
+    // Show initial welcome message
+    showInitialMessage();
+
+  } catch (err) {
+    console.error("Bootstrap failed", err);
+    showScreen(true);
+    // Still show initial message
+    showInitialMessage();
+  }
+ }
   bootstrapUser();
 
   // -----------------------------------------------
@@ -294,7 +318,8 @@ document.addEventListener("DOMContentLoaded", () => {
     appendMessage("user", query);
     inputField.value = "";
 
-    showTyping();
+  //showTyping();
+	await showTypingIndicator(1200); // show typing for 1.2s
 
     try {
       const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
