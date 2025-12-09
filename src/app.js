@@ -6,18 +6,17 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   // -----------------------------------------------
-  // ENV VARS (Vite → Vercel)
+  // ENV VARS
   // -----------------------------------------------
-  const API_SECRET = import.meta.env.VITE_API_SECRET;
+  const API_SECRET   = import.meta.env.VITE_API_SECRET;
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
-  
+
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Stripe Price IDs (PRODUCTION)
   const STRIPE_MONTHLY_PRICE_ID = "price_1SWNgmQZiiSZQI7eU1dUbHez";
   const STRIPE_ANNUAL_PRICE_ID  = "price_1SWNgmQZiiSZQI7eSqTsjwhm";
-
 
   // -----------------------------------------------
   // DOM ELEMENTS
@@ -52,14 +51,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const upgradeBanner    = document.getElementById("upgrade-banner");
   const upgradeLink      = document.getElementById("upgrade-link");
 
-  const trialExpiredBox  = document.getElementById("trial-expired");
+  const trialExpiredBox   = document.getElementById("trial-expired");
   const trialSubscribeBtn = document.getElementById("subscribe-btn");
 
   const subscribeModal   = document.getElementById("subscribe-modal");
   const subMonthlyBtn    = document.getElementById("sub-monthly");
   const subAnnualBtn     = document.getElementById("sub-annual");
   const subCancelBtn     = document.getElementById("sub-cancel");
-
 
   // -----------------------------------------------
   // STATE
@@ -69,10 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let userEmail = null;
   let typingBubble = null;
 
-  // Short in-browser conversation memory:
-  // [{ role: "user" | "assistant", content: string }, ...]
   let conversationHistory = [];
-
 
   // -----------------------------------------------
   // HELPERS
@@ -96,24 +91,18 @@ document.addEventListener("DOMContentLoaded", () => {
     typingBubble.className = "msg-nani";
     typingBubble.innerHTML = `
       <div class="typing-indicator">
-        <div class="typing-dots">
-          <div></div><div></div><div></div>
-        </div>
+        <div class="typing-dots"><div></div><div></div><div></div></div>
       </div>`;
     chatBox.appendChild(typingBubble);
-    chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   function hideTyping() {
-    if (typingBubble) {
-      typingBubble.remove();
-      typingBubble = null;
-    }
+    if (typingBubble) typingBubble.remove();
+    typingBubble = null;
   }
 
   function setRoleBadge(role) {
     accRoleBadge.classList.remove("premium", "trial", "free");
-
     if (role === "premium") {
       accRoleBadge.textContent = "Premium";
       accRoleBadge.classList.add("premium");
@@ -126,39 +115,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Keep last few turns only (to avoid huge payloads)
   function addToHistory(sender, text) {
     conversationHistory.push({ role: sender === "user" ? "user" : "assistant", content: text });
-    if (conversationHistory.length > 8) {
-      conversationHistory = conversationHistory.slice(-8);
-    }
+    if (conversationHistory.length > 8) conversationHistory = conversationHistory.slice(-8);
   }
 
-
   // -----------------------------------------------
-  // UPDATE SUBSCRIPTION UI
+  // SUBSCRIPTION UI
   // -----------------------------------------------
   function updateSubscriptionUI(info) {
     const isSubscribed = info.subscribed === true;
     const trialActive  = info.trial_active === true;
 
-    accSubStatus.textContent   = isSubscribed ? "Premium Active" : (trialActive ? "Trial Active" : "Free");
+    accSubStatus.textContent   = isSubscribed ? "Premium Active" : trialActive ? "Trial Active" : "Free";
     accTrialStatus.textContent = trialActive ? "Active" : "Expired";
-    accDaysLeft.textContent    = info.days_left;
+    accDaysLeft.textContent    = info.days_left ?? "—";
 
-    // Hide/Show upgrade areas
     if (isSubscribed) {
       accUpgradeBlock.classList.add("hidden");
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
       manageBillingBtn.classList.remove("hidden");
-
     } else if (trialActive) {
       accUpgradeBlock.classList.remove("hidden");
       upgradeBanner.classList.remove("hidden");
       manageBillingBtn.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
-
     } else {
       accUpgradeBlock.classList.remove("hidden");
       manageBillingBtn.classList.add("hidden");
@@ -167,206 +149,113 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   // -----------------------------------------------
-  // SUBSCRIBE MODAL CONTROL
+  // 🔐 BOOTSTRAP USER (KEY FIX)
   // -----------------------------------------------
-  function openSubscribeModal() {
-    subscribeModal.classList.remove("hidden");
-  }
-
-  function closeSubscribeModal() {
-    subscribeModal.classList.add("hidden");
-  }
-
-  subCancelBtn.addEventListener("click", closeSubscribeModal);
-
-
-  // -----------------------------------------------
-  // LOAD EXISTING SESSION
-  // -----------------------------------------------
-  async function loadSession() {
+  async function bootstrapUser() {
     const { data } = await sb.auth.getSession();
-
-    if (data.session) {
-      session = data.session;
-      accessToken = session.access_token;
-      userEmail = session.user.email;
-
-      localStorage.setItem("nani_access_token", accessToken);
-      localStorage.setItem("nani_user_email", userEmail);
-
-      showScreen(true);
-    } else {
+    if (!data.session) {
       showScreen(false);
-    }
-  }
-
-  loadSession();
-
-
-  // -----------------------------------------------
-  // AUTH: MAGIC LINK
-  // -----------------------------------------------
-  sendMagicBtn.addEventListener("click", async () => {
-    const email = magicEmailInput.value.trim();
-    if (!email.includes("@")) {
-      alert("Enter a valid email");
       return;
     }
 
-    sendMagicBtn.textContent = "Sending...";
+    session = data.session;
+    accessToken = session.access_token;
+    userEmail = session.user.email;
 
-    const { error } = await sb.auth.signInWithOtp({
+    localStorage.setItem("nani_access_token", accessToken);
+    localStorage.setItem("nani_user_email", userEmail);
+
+    try {
+      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+        headers: {
+          "X-API-KEY": API_SECRET,
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+
+      if (!res.ok) throw new Error("auth/status failed");
+
+      const info = await res.json();
+      accEmail.textContent = userEmail;
+      setRoleBadge(info.role);
+      updateSubscriptionUI(info);
+      showScreen(true);
+
+    } catch (err) {
+      console.error("Bootstrap failed", err);
+      showScreen(true); // fail open instead of blank screen
+    }
+  }
+
+  // -----------------------------------------------
+  // LOAD SESSION ON PAGE LOAD
+  // -----------------------------------------------
+  bootstrapUser();
+
+  // -----------------------------------------------
+  // AUTH HANDLERS
+  // -----------------------------------------------
+  sendMagicBtn.addEventListener("click", async () => {
+    const email = magicEmailInput.value.trim();
+    if (!email.includes("@")) return alert("Enter a valid email");
+
+    await sb.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.origin }
     });
 
-    sendMagicBtn.textContent = "Send One-Time Login Link";
-
-    if (error) alert(error.message);
-    else alert("Magic link sent. Check your inbox.");
+    alert("Magic link sent.");
   });
 
-
-  // -----------------------------------------------
-  // AUTH: GOOGLE
-  // -----------------------------------------------
-  googleBtn.addEventListener("click", async () => {
-    await sb.auth.signInWithOAuth({
+  googleBtn.addEventListener("click", () => {
+    sb.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin }
     });
   });
 
-
-  // -----------------------------------------------
-  // AUTH STATE CHANGE
-  // -----------------------------------------------
   sb.auth.onAuthStateChange((_event, newSession) => {
-    if (newSession) {
-      session = newSession;
-      accessToken = newSession.access_token;
-      userEmail = newSession.user.email;
-
-      localStorage.setItem("nani_access_token", accessToken);
-      localStorage.setItem("nani_user_email", userEmail);
-      showScreen(true);
-    }
+    if (newSession) bootstrapUser();
   });
 
+  // -----------------------------------------------
+  // ACCOUNT PANEL
+  // -----------------------------------------------
+  accountBtn.addEventListener("click", () => accountPanel.classList.remove("hidden"));
+  accCloseBtn.addEventListener("click", () => accountPanel.classList.add("hidden"));
 
   // -----------------------------------------------
-  // STRIPE CHECKOUT FLOW
+  // UPGRADE FLOW
   // -----------------------------------------------
+  function openSubscribeModal() {
+    subscribeModal.classList.remove("hidden");
+  }
+  function closeSubscribeModal() {
+    subscribeModal.classList.add("hidden");
+  }
+  subCancelBtn.onclick = closeSubscribeModal;
+  accUpgradeOpen.onclick = openSubscribeModal;
+  upgradeLink.onclick = openSubscribeModal;
+  trialSubscribeBtn.onclick = openSubscribeModal;
+
   async function startCheckout(priceId) {
     const { data: { user } } = await sb.auth.getUser();
-    if (!user) {
-      alert("Please log in again.");
-      return;
-    }
+    if (!user) return alert("Please log in again.");
 
-    const response = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
+    const r = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": API_SECRET
-      },
-      body: JSON.stringify({
-        price_id: priceId,
-        email: user.email,
-        user_id: user.id
-      })
+      headers: { "Content-Type": "application/json", "X-API-KEY": API_SECRET },
+      body: JSON.stringify({ price_id: priceId, user_id: user.id, email: user.email })
     });
 
-    const data = await response.json();
-
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      console.error(data);
-      alert("Checkout could not start.");
-    }
+    const j = await r.json();
+    if (j.checkout_url) window.location.href = j.checkout_url;
+    else alert("Checkout failed");
   }
 
-
-  // -----------------------------------------------
-  // ACCOUNT PANEL OPEN
-  // -----------------------------------------------
-  accountBtn.addEventListener("click", async () => {
-    if (!accessToken) {
-      accountPanel.classList.remove("hidden");
-      return;
-    }
-
-    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-      headers: {
-        "X-API-KEY": API_SECRET,
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
-
-    const info = await res.json();
-
-    accEmail.textContent = userEmail;
-    setRoleBadge(info.role);
-    updateSubscriptionUI(info);
-
-    accountPanel.classList.remove("hidden");
-  });
-
-  accCloseBtn.addEventListener("click", () => {
-    accountPanel.classList.add("hidden");
-  });
-
-
-  // -----------------------------------------------
-  // PREMIUM UPGRADE BUTTON → OPEN MODAL
-  // -----------------------------------------------
-  accUpgradeOpen.addEventListener("click", openSubscribeModal);
-  upgradeLink.addEventListener("click", openSubscribeModal);
-  trialSubscribeBtn.addEventListener("click", openSubscribeModal);
-
-
-  // -----------------------------------------------
-  // SUBSCRIPTION CHOICES
-  // -----------------------------------------------
-  subMonthlyBtn.addEventListener("click", () => {
-    closeSubscribeModal();
-    startCheckout(STRIPE_MONTHLY_PRICE_ID);
-  });
-
-  subAnnualBtn.addEventListener("click", () => {
-    closeSubscribeModal();
-    startCheckout(STRIPE_ANNUAL_PRICE_ID);
-  });
-
-
-  // -----------------------------------------------
-  // MANAGE BILLING (Premium Only)
-  // -----------------------------------------------
-  manageBillingBtn.addEventListener("click", async () => {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-
-    const res = await fetch("https://naturopathy.onrender.com/create_customer_portal", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": API_SECRET
-      },
-      body: JSON.stringify({ user_id: user.id })
-    });
-
-    const data = await res.json();
-
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert("Unable to open billing portal.");
-    }
-  });
-
+  subMonthlyBtn.onclick = () => { closeSubscribeModal(); startCheckout(STRIPE_MONTHLY_PRICE_ID); };
+  subAnnualBtn.onclick  = () => { closeSubscribeModal(); startCheckout(STRIPE_ANNUAL_PRICE_ID); };
 
   // -----------------------------------------------
   // LOGOUT
@@ -374,31 +263,20 @@ document.addEventListener("DOMContentLoaded", () => {
   accLogoutBtn.addEventListener("click", async () => {
     await sb.auth.signOut();
     localStorage.clear();
-    conversationHistory = []; // reset conversation on logout
+    conversationHistory = [];
     showScreen(false);
     accountPanel.classList.add("hidden");
   });
 
-
   // -----------------------------------------------
-  // SEND MESSAGE → NANI (CONVERSATIONAL)
+  // CHAT
   // -----------------------------------------------
   async function sendToNani() {
     const query = inputField.value.trim();
     if (!query) return;
 
-    if (!accessToken) {
-      appendMessage("nani", "⚠️ Please sign in again.");
-      return;
-    }
-
-    // Show user bubble
     appendMessage("user", query);
     inputField.value = "";
-
-    // For this request, send ONLY previous turns.
-    // We'll append this new Q + response to history AFTER the call.
-    const historyPayload = conversationHistory.slice();
 
     showTyping();
 
@@ -412,34 +290,26 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify({
           query,
+          history: conversationHistory,
           match_threshold: 0.4,
-          match_count: 3,
-          history: historyPayload
+          match_count: 3
         })
       });
 
       const data = await res.json();
       hideTyping();
+      appendMessage("nani", data.summary || "⚠️ Error");
 
-      if (data.error) {
-        appendMessage("nani", "⚠️ " + data.error);
-      } else {
-        appendMessage("nani", data.summary);
+      addToHistory("user", query);
+      addToHistory("assistant", data.summary || "");
 
-        // Now that round-trip is done, update conversation memory
-        addToHistory("user", query);
-        addToHistory("assistant", data.summary);
-      }
-
-    } catch (err) {
+    } catch {
       hideTyping();
-      appendMessage("nani", "⚠️ Network error. Try again.");
+      appendMessage("nani", "⚠️ Network error.");
     }
   }
 
-  sendBtn.addEventListener("click", sendToNani);
-  inputField.addEventListener("keypress", e => {
-    if (e.key === "Enter") sendToNani();
-  });
+  sendBtn.onclick = sendToNani;
+  inputField.onkeypress = e => e.key === "Enter" && sendToNani();
 
 });
