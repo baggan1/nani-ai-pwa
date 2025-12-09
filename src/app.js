@@ -133,14 +133,12 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   function updateUpgradeUI(info) {
     if (info.subscribed) {
         // Premium users: hide upgrade buttons
-        accUpgradeBlock?.classList.add("hidden");
-        // But keep manage billing visible
-        manageBillingBtn.classList.remove("hidden");
+        accUpgradeBlock?.classList.add("hidden"); //hide button
+        manageBillingBtn.classList.remove("hidden"); // But keep manage billing visible
     } else {
         // Free or trial users: show upgrade buttons
-        accUpgradeBlock?.classList.remove("hidden");
-        // Hide manage billing if not subscribed
-        manageBillingBtn.classList.add("hidden");
+        accUpgradeBlock?.classList.remove("hidden");//SHow Upgrade button
+        manageBillingBtn.classList.add("hidden"); // Hide manage billing if not subscribed
     }
   }
   
@@ -154,12 +152,15 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     if (info.subscribed) {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
+	  manageBillingBtn.classList.remove("hidden");
     } else if (info.trial_active) {
       upgradeBanner.classList.remove("hidden");
       trialExpiredBox.classList.add("hidden");
+	  manageBillingBtn.classList.add("hidden");
     } else {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.remove("hidden");
+	  manageBillingBtn.classList.add("hidden");
     }
 	updateUpgradeUI(info);
   }
@@ -272,6 +273,9 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     if (!session || !session.user) return alert("Please log in to subscribe");
     startCheckout(STRIPE_ANNUAL_PRICE_ID);
   });
+  accUpgradeOpen?.addEventListener("click", () => {
+    subscribeModal.classList.remove("hidden");
+  });
 
   // -----------------------------------------------
   // SUBSCRIPTION MODAL
@@ -298,7 +302,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
 
   subMonthlyBtn.onclick = () => { closeSubscribeModal(); startCheckout(STRIPE_MONTHLY_PRICE_ID); };
   subAnnualBtn.onclick  = () => { closeSubscribeModal(); startCheckout(STRIPE_ANNUAL_PRICE_ID); };
-
+  subCancelBtn.onclick = () => subscribeModal.classList.add("hidden");
   // -----------------------------------------------
   // CHAT
   // -----------------------------------------------
