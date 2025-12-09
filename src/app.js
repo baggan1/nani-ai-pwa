@@ -2,6 +2,7 @@
  * NANI-AI PWA (Supabase Auth + Automatic Trial)
  * Conversational Version — Sends Short History
  ***************************************************/
+import { createClient } from '@supabase/supabase-js';
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -12,8 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-  
-  import { createClient } from '@supabase/supabase-js';
+  console.log("Supabase URL:", SUPABASE_URL);
+  console.log("Supabase Key present:", !!SUPABASE_KEY);
+  console.log("API_SECRET present:", !!API_SECRET);
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error("Supabase environment variables are missing!");
+    return;
+  }
+
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   window.sb = sb;
 
@@ -156,20 +164,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔐 BOOTSTRAP USER (KEY FIX)
   // -----------------------------------------------
   async function bootstrapUser() {
-    const { data } = await sb.auth.getSession();
-    if (!data.session) {
-      showScreen(false);
-      return;
-    }
-
-    session = data.session;
-    accessToken = session.access_token;
-    userEmail = session.user.email;
-
-    localStorage.setItem("nani_access_token", accessToken);
-    localStorage.setItem("nani_user_email", userEmail);
-
     try {
+      const { data } = await sb.auth.getSession();
+      if (!data?.session) {
+        console.log("No session found, showing welcome screen.");
+        showScreen(false);
+        return;
+      }
+
+      session = data.session;
+      accessToken = session.access_token;
+      userEmail = session.user.email;
+
+      localStorage.setItem("nani_access_token", accessToken);
+      localStorage.setItem("nani_user_email", userEmail);
+
+      console.log("Session found for user:", userEmail);
+
       const res = await fetch("https://naturopathy.onrender.com/auth/status", {
         headers: {
           "X-API-KEY": API_SECRET,
@@ -191,9 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // -----------------------------------------------
-  // LOAD SESSION ON PAGE LOAD
-  // -----------------------------------------------
   bootstrapUser();
 
   // -----------------------------------------------
@@ -203,12 +211,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = magicEmailInput.value.trim();
     if (!email.includes("@")) return alert("Enter a valid email");
 
-    await sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin }
-    });
-
-    alert("Magic link sent.");
+    try {
+      await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      });
+      alert("Magic link sent.");
+    } catch (err) {
+      console.error("Magic link error:", err);
+      alert("Failed to send magic link.");
+    }
   });
 
   googleBtn.addEventListener("click", () => {
@@ -220,18 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   sb.auth.onAuthStateChange((_event, newSession) => {
     if (newSession) bootstrapUser();
-  }); 
-  
-  sb.auth.onAuthStateChange((_event, session) => {
-	if (!session) return;
-
-	console.log("Auth timestamps:", {
-	 created_at: session.user.created_at,
-     last_sign_in_at: session.user.last_sign_in_at,
-     expires_at: session.expires_at,
-    });
-	console.log("Supabase URL:", SUPABASE_URL);
   });
+
 
   // -----------------------------------------------
   // ACCOUNT PANEL
