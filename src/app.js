@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
   
+  import { createClient } from '@supabase/supabase-js';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   window.sb = sb;
 
