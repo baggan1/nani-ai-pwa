@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
   window.sb = sb;
 
   // Stripe Price IDs (PRODUCTION)
@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let accessToken = null;
   let userEmail = null;
   let typingBubble = null;
-
   let conversationHistory = [];
 
   // -----------------------------------------------
@@ -87,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     welcomeScreen.style.display = authed ? "none" : "block";
     chatApp.style.display       = authed ? "block" : "none";
   }
-
+  
   function appendMessage(sender, text) {
     const wrapper = document.createElement("div");
     wrapper.className = sender === "user" ? "msg-user" : "msg-nani";
@@ -96,6 +95,23 @@ document.addEventListener("DOMContentLoaded", () => {
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
+  function addToHistory(sender, text) {
+    conversationHistory.push({ role: sender === "user" ? "user" : "assistant", content: text });
+    if (conversationHistory.length > 8) conversationHistory = conversationHistory.slice(-8);
+  }
+  
+  function showInitialMessage() {
+    if (hasShownWelcome) return;
+    hasShownWelcome = true;
+
+    const msg = `
+🌿 Hello! I'm Nani, your natural wellness guide.
+Ask me about lifestyle, diet, or wellness tips to get started.
+    `;
+    appendMessage("nani", msg);
+    addToHistory("assistant", msg);
+  }
+  
   function showTyping() {
     hideTyping();
     typingBubble = document.createElement("div");
@@ -108,157 +124,132 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hideTyping() {
-    if (typingBubble) typingBubble.remove();
+    typingBubble?.remove();
     typingBubble = null;
   }
 
+  // -----------------------------------------------
+  // ACCOUNT BADGES
+  // -----------------------------------------------
+  // ACCOUNT BADGES
+  // -----------------------------------------------
   function setRoleBadge(role) {
-    accRoleBadge.classList.remove("premium", "trial", "free");
-    if (role === "premium") {
-      accRoleBadge.textContent = "Premium";
-      accRoleBadge.classList.add("premium");
-    } else if (role === "trial") {
-      accRoleBadge.textContent = "Trial";
-      accRoleBadge.classList.add("trial");
-    } else {
-      accRoleBadge.textContent = "Free";
-      accRoleBadge.classList.add("free");
-    }
+    accRoleBadge.className = "role-badge";
+    accRoleBadge.textContent = role === "premium" ? "Premium" :
+                               role === "trial"   ? "Trial" : "Free";
   }
 
-  function addToHistory(sender, text) {
-    conversationHistory.push({ role: sender === "user" ? "user" : "assistant", content: text });
-    if (conversationHistory.length > 8) conversationHistory = conversationHistory.slice(-8);
-  }
-
-// ----------------------------
-// INITIAL CHAT MESSAGE
-// ----------------------------
-  function showInitialMessage() {
-	const welcomeText = `
-  🌿 Hello! I'm Nani, your natural wellness guide.
-  Ask me about lifestyle, diet, or wellness tips to get started.
-	`;
-	appendMessage("nani", welcomeText);
-	addToHistory("assistant", welcomeText);
-  }
-
-// ----------------------------
-// ENHANCED TYPING INDICATOR
-// ----------------------------
-  function showTypingIndicator(duration = 1000) {
-	showTyping();
-	return new Promise(resolve => setTimeout(() => {
-		hideTyping();
-		resolve();
-	}, duration));
-  }
-
-  // -----------------------------------------------
-  // SUBSCRIPTION UI
-  // -----------------------------------------------
   function updateSubscriptionUI(info) {
-    const isSubscribed = info.subscribed === true;
-    const trialActive  = info.trial_active === true;
-
-    accSubStatus.textContent   = isSubscribed ? "Premium Active" : trialActive ? "Trial Active" : "Free";
-    accTrialStatus.textContent = trialActive ? "Active" : "Expired";
+    accEmail.textContent       = session.user.email;
+    accSubStatus.textContent   = info.subscribed ? "Premium Active" :
+                                info.trial_active ? "Trial Active" : "Free";
+    accTrialStatus.textContent = info.trial_active ? "Active" : "Expired";
     accDaysLeft.textContent    = info.days_left ?? "—";
 
-    if (isSubscribed) {
-      accUpgradeBlock.classList.add("hidden");
+    if (info.subscribed) {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
       manageBillingBtn.classList.remove("hidden");
-    } else if (trialActive) {
-      accUpgradeBlock.classList.remove("hidden");
+    } else if (info.trial_active) {
       upgradeBanner.classList.remove("hidden");
-      manageBillingBtn.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
-    } else {
-      accUpgradeBlock.classList.remove("hidden");
       manageBillingBtn.classList.add("hidden");
+    } else {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.remove("hidden");
+      manageBillingBtn.classList.add("hidden");
     }
   }
 
   // -----------------------------------------------
-  // 🔐 BOOTSTRAP USER (KEY FIX)
+  // 🔐 BOOTSTRAP USER
   // -----------------------------------------------
- async function bootstrapUser() {
-  const { data } = await sb.auth.getSession();
-  if (!data.session) {
-    showScreen(false);
-    return;
+  async function bootstrapUser() {
+    const { data } = await sb.auth.getSession();
+    if (!data.session) {
+      showScreen(false);
+      return;
+    }
+
+    session = data.session;
+    accessToken = session.access_token;
+    userEmail = session.user.email;
+
+    localStorage.setItem("nani_access_token", accessToken);
+    localStorage.setItem("nani_user_email", userEmail);
+
+    try {
+      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+        headers: { "X-API-KEY": API_SECRET, "Authorization": `Bearer ${accessToken}` }
+      });
+
+      if (!res.ok) throw new Error("auth/status failed");
+
+      const info = await res.json();
+      accEmail.textContent = userEmail;
+      setRoleBadge(info.role);
+      updateSubscriptionUI(info);
+      showScreen(true);
+
+      showInitialMessage();
+
+    } catch (err) {
+      console.error("Bootstrap failed", err);
+      showScreen(true);
+      showInitialMessage();
+    }
   }
 
-  session = data.session;
-  accessToken = session.access_token;
-  userEmail = session.user.email;
+// -----------------------------------------------
+// ✅ AUTH INIT (FIXES BLANK SCREEN ISSUE)
+// -----------------------------------------------
+  async function initAuth() {
+	// 1️⃣ Handle restored sessions (Google redirect / refresh)
+	const { data } = await sb.auth.getSession();
 
-  localStorage.setItem("nani_access_token", accessToken);
-  localStorage.setItem("nani_user_email", userEmail);
+	if (data.session) {
+		await bootstrapUser();
+	} else {
+		showScreen(false);
+	}
 
-  try {
-    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-      headers: {
-        "X-API-KEY": API_SECRET,
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
+	// 2️⃣ Listen for future auth changes
+	sb.auth.onAuthStateChange(async (event, newSession) => {
+		console.log("Supabase Auth Event:", event);
 
-    if (!res.ok) throw new Error("auth/status failed");
-
-    const info = await res.json();
-    accEmail.textContent = userEmail;
-    setRoleBadge(info.role);
-    updateSubscriptionUI(info);
-    showScreen(true);
-
-    // Show initial welcome message
-    showInitialMessage();
-
-  } catch (err) {
-    console.error("Bootstrap failed", err);
-    showScreen(true);
-    // Still show initial message
-    showInitialMessage();
+		if (newSession) {
+		await bootstrapUser();
+		} else {
+		showScreen(false);
+		}
+	});
   }
- }
-  bootstrapUser();
 
+  initAuth();
+  
   // -----------------------------------------------
   // AUTH HANDLERS
   // -----------------------------------------------
-  sendMagicBtn.addEventListener("click", async () => {
+  sendMagicBtn.onclick = async () => {
     const email = magicEmailInput.value.trim();
-    if (!email.includes("@")) return alert("Enter a valid email");
+    if (!email.includes("@")) return alert("Enter valid email");
+    await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin }
+    });
+    alert("Magic link sent");
+  };
 
-    try {
-      await sb.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin }
-      });
-      alert("Magic link sent.");
-    } catch (err) {
-      console.error("Magic link error:", err);
-      alert("Failed to send magic link.");
-    }
-  });
-
-  googleBtn.addEventListener("click", () => {
+  googleBtn.onclick = () => {
     sb.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin }
     });
-  });
+  };
 
-  sb.auth.onAuthStateChange((_event, newSession) => {
-    if (newSession) bootstrapUser();
-  });
-
-
+  accLogoutBtn.onclick = async () => {
+    await sb.auth.signOut();
+  };
   // -----------------------------------------------
   // ACCOUNT PANEL
   // -----------------------------------------------
@@ -268,27 +259,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------------
   // UPGRADE FLOW
   // -----------------------------------------------
-  function openSubscribeModal() {
-    subscribeModal.classList.remove("hidden");
-  }
-  function closeSubscribeModal() {
-    subscribeModal.classList.add("hidden");
-  }
+  function openSubscribeModal() { subscribeModal.classList.remove("hidden"); }
+  function closeSubscribeModal() { subscribeModal.classList.add("hidden"); }
+
   subCancelBtn.onclick = closeSubscribeModal;
-  accUpgradeOpen.onclick = openSubscribeModal;
-  upgradeLink.onclick = openSubscribeModal;
-  trialSubscribeBtn.onclick = openSubscribeModal;
+  accUpgradeOpen?.addEventListener("click", openSubscribeModal);
+  upgradeLink?.addEventListener("click", openSubscribeModal);
+  trialSubscribeBtn?.addEventListener("click", openSubscribeModal);
 
   async function startCheckout(priceId) {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) return alert("Please log in again.");
-
     const r = await fetch("https://naturopathy.onrender.com/create_checkout_session", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-API-KEY": API_SECRET },
       body: JSON.stringify({ price_id: priceId, user_id: user.id, email: user.email })
     });
-
     const j = await r.json();
     if (j.checkout_url) window.location.href = j.checkout_url;
     else alert("Checkout failed");
@@ -316,18 +302,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!query) return;
 
     appendMessage("user", query);
+    addToHistory("user", query);
     inputField.value = "";
-
-  //showTyping();
-	await showTypingIndicator(1200); // show typing for 1.2s
+    showTyping();
 
     try {
       const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": API_SECRET,
-          "Authorization": `Bearer ${accessToken}`
+          "Authorization": `Bearer ${accessToken}`,
+          "X-API-KEY": API_SECRET
         },
         body: JSON.stringify({
           query,
@@ -336,17 +321,13 @@ document.addEventListener("DOMContentLoaded", () => {
           match_count: 3
         })
       });
-
       const data = await res.json();
       hideTyping();
       appendMessage("nani", data.summary || "⚠️ Error");
-
-      addToHistory("user", query);
       addToHistory("assistant", data.summary || "");
-
     } catch {
       hideTyping();
-      appendMessage("nani", "⚠️ Network error.");
+      appendMessage("nani", "⚠️ Network error");
     }
   }
 

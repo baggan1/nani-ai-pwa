@@ -53,14 +53,16 @@ button {
   font-size: 1rem;
 }
 
-#welcome-screen input,
-#welcome-screen button {
+.welcome-screen input,
+.welcome-screen button {
   width: 100%;
+  max-width: 360px;
   padding: 14px;
   border-radius: 10px;
   border: 1px solid #bcdcdc;
   margin-bottom: 12px;
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
 .welcome-screen input,
@@ -75,12 +77,6 @@ button {
   width: 100%;
   max-width: 360px;
   margin: 0 auto;
-}
-
-.welcome-form-group input,
-.welcome-form-group button {
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .welcome-form-group .divider {
