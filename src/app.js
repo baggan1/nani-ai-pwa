@@ -8,14 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------------
   // ENV VARS
   // -----------------------------------------------
- //const API_SECRET   = import.meta.env.VITE_API_SECRET;
- //const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
- //const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+  const API_SECRET   = import.meta.env.VITE_API_SECRET;
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-  const API_SECRET   = process.env.API_SECRET;
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
   
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   window.sb = sb;
