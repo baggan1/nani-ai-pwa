@@ -216,9 +216,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
- /* sb.auth.onAuthStateChange((_event, newSession) => {
+  sb.auth.onAuthStateChange((_event, newSession) => {
     if (newSession) bootstrapUser();
-  }); */
+  }); 
   
   sb.auth.onAuthStateChange((_event, session) => {
 	if (!session) return;
