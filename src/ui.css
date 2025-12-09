@@ -15,6 +15,7 @@ body {
   max-width: 520px;
   margin: auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 button {
@@ -62,17 +63,14 @@ button {
   font-size: 1rem;
 }
 
-/* Ensure email input + magic link button + Google button match width */
 .welcome-screen input,
 .welcome-screen button,
 .welcome-screen .google-btn {
   width: 100%;
   max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
-/* Ensures email input + both buttons match width perfectly */
 .welcome-form-group {
   width: 100%;
   max-width: 360px;
@@ -89,8 +87,6 @@ button {
   text-align: center;
   margin: 12px 0;
 }
-
-
 
 /* Magic Link */
 #send-magic-btn {
@@ -172,15 +168,17 @@ button {
 #nani-chat-box {
   height: 420px;
   overflow-y: auto;
-  background: white;
+  background: #ffffff;
   border-radius: 14px;
   border: 1px solid #c7e7e7;
   padding: 14px;
   margin-bottom: 20px;
+  color: #0a3d3d; /* ensures default text is visible */
+  box-sizing: border-box;
 }
 
 /* -------------------------------------------------
-   TYPING INDICATOR — THINKING BUBBLES
+   TYPING INDICATOR
 -------------------------------------------------- */
 .typing-indicator {
   display: flex;
@@ -215,19 +213,20 @@ button {
   40% { opacity: 1; transform: translateY(-3px); }
 }
 
-
 /* -------------------------------------------------
    CHAT MESSAGES
 -------------------------------------------------- */
 .msg-user .bubble {
   background: #d4f7e2;
+  color: #0a3d3d;
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 10px;
 }
 
 .msg-nani .bubble {
-  background: #e3f8f8;
+  background: #b3f0e0; /* darker for contrast */
+  color: #0a3d3d; /* ensures visibility */
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 10px;
@@ -367,82 +366,34 @@ button {
 }
 
 /* -------------------------------------------------
-   DARK MODE (Restored + Improved)
+   DARK MODE
 -------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
-  body {
-    background: #0f1b26;
-    color: #e7f5f5;
-  }
+  body { background: #0f1b26; color: #e7f5f5; }
 
   .welcome-screen { background: #0f1b26; }
-  #welcome-screen input {
-    background: #12222f;
-    border-color: #305060;
-    color: #e7f5f5;
-  }
-  #welcome-screen button {
-    background: #158b8b;
-    color: white;
-    border: none;
-  }
+  #welcome-screen input { background: #12222f; border-color: #305060; color: #e7f5f5; }
+  #welcome-screen button { background: #158b8b; color: white; border: none; }
 
-  .google-btn { 
-    background: #1a2a35; 
-    border-color: #304858;
-    color: #e7f5f5;
-  }
+  .google-btn { background: #1a2a35; border-color: #304858; color: #e7f5f5; }
   .google-btn:hover { background: #223643; }
 
   .header { background: #14212e; border-bottom-color: #203544; }
 
-  #nani-chat-box { 
-    background: #13222e; 
-    border-color: #204458;
-    color: #e7f5f5;
-  }
-
+  #nani-chat-box { background: #13222e; border-color: #204458; color: #e7f5f5; }
   .msg-user .bubble { background: #1e3a4a; color: #dceff0; }
   .msg-nani .bubble { background: #26485d; color: #e8fbfb; }
 
-  #nani-input {
-    background: #10202c;
-    border-color: #203c50;
-    color: #e8fbfb;
-  }
-
+  #nani-input { background: #10202c; border-color: #203c50; color: #e8fbfb; }
   #nani-send-btn { background: #158b8b; color: white; }
 
-  .upgrade-banner {
-    background: #1e3b32;
-    border-color: #24584a;
-    color: #c3f0e2;
-  }
+  .upgrade-banner { background: #1e3b32; border-color: #24584a; color: #c3f0e2; }
+  .expired-box { background: #4a3714; border-color: #7a5a2b; color: #ffdba3; }
 
-  .expired-box {
-    background: #4a3714;
-    border-color: #7a5a2b;
-    color: #ffdba3;
-  }
-
-  .panel-content { 
-    background: #14222d; 
-    color: #e7f5f5; 
-  }
-
-  .subscribe-btn {
-    background: #158b8b;
-    color: white;
-  }
-
-  .subscribe-btn.outline {
-    background: transparent;
-    color: #65d7d7;
-    border-color: #65d7d7;
-  }
-
+  .panel-content { background: #14222d; color: #e7f5f5; }
+  .subscribe-btn { background: #158b8b; color: white; }
+  .subscribe-btn.outline { background: transparent; color: #65d7d7; border-color: #65d7d7; }
   .close-btn { background: #2d3f4c; color: #d6e6eb; }
-
   .logout-btn { background: #a83c3c; color: white; }
 
   .typing-indicator { background: #203544; }
