@@ -36,11 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const googleBtn        = document.getElementById("google-btn");
 
   const chatBox          = document.getElementById("nani-chat-box");
-  const inputField		 = document.getElementById("nani-input");
+  const inputField       = document.getElementById("nani-input");
   const sendBtn          = document.getElementById("nani-send-btn");
 
   const accountBtn       = document.getElementById("account-btn");
   const accountPanel     = document.getElementById("account-panel");
+  const accCloseBtn      = document.getElementById("acc-close");
+  const accLogoutBtn     = document.getElementById("acc-logout-btn");
 
   const accEmail         = document.getElementById("acc-email");
   const accTrialStatus   = document.getElementById("acc-trial-status");
@@ -48,17 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const accSubStatus     = document.getElementById("acc-sub-status");
   const accRoleBadge     = document.getElementById("acc-role-badge");
 
-  const accUpgradeBlock  = document.getElementById("acc-upgrade-block"); //not being used
-  const accUpgradeOpen   = document.getElementById("acc-upgrade-open");   //not being used
-
-  const manageBillingBtn = document.getElementById("manage-billing-btn");
-  const accLogoutBtn     = document.getElementById("acc-logout-btn");
-  const accCloseBtn      = document.getElementById("acc-close");
-
   const upgradeBanner    = document.getElementById("upgrade-banner");
   const upgradeLink      = document.getElementById("upgrade-link");
-
-  const trialExpiredBox   = document.getElementById("trial-expired");
+  const trialExpiredBox  = document.getElementById("trial-expired");
   const trialSubscribeBtn = document.getElementById("subscribe-btn");
 
   const subscribeModal   = document.getElementById("subscribe-modal");
@@ -82,8 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function showScreen(authed) {
     welcomeScreen.style.display = authed ? "none" : "block";
     chatApp.style.display       = authed ? "block" : "none";
+    if (authed) inputField.disabled = false;
   }
-  
+
   function appendMessage(sender, text) {
     const wrapper = document.createElement("div");
     wrapper.className = sender === "user" ? "msg-user" : "msg-nani";
@@ -96,11 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
     conversationHistory.push({ role: sender === "user" ? "user" : "assistant", content: text });
     if (conversationHistory.length > 8) conversationHistory = conversationHistory.slice(-8);
   }
-  
+
   function showInitialMessage() {
     if (hasShownWelcome) return;
     hasShownWelcome = true;
-
     const msg = `
 🌿 Hello! I'm Nani, your natural wellness guide.
 Ask me about lifestyle, diet, or wellness tips to get started.
@@ -108,11 +102,12 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     appendMessage("nani", msg);
     addToHistory("assistant", msg);
   }
-  
+
   function showTyping() {
     hideTyping();
     typingBubble = document.createElement("div");
     typingBubble.className = "msg-nani";
+    typingBubble.id = "typing-bubble";
     typingBubble.innerHTML = `
       <div class="typing-indicator">
         <div class="typing-dots"><div></div><div></div><div></div></div>
@@ -121,13 +116,10 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   }
 
   function hideTyping() {
-    typingBubble?.remove();
+    document.getElementById("typing-bubble")?.remove();
     typingBubble = null;
   }
 
-  // -----------------------------------------------
-  // ACCOUNT BADGES
-  // -----------------------------------------------
   function setRoleBadge(role) {
     accRoleBadge.className = "role-badge";
     accRoleBadge.textContent = role === "premium" ? "Premium" :
@@ -135,7 +127,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   }
 
   function updateSubscriptionUI(info) {
-    accEmail.textContent       = session.user.email;
+    accEmail.textContent       = userEmail;
     accSubStatus.textContent   = info.subscribed ? "Premium Active" :
                                 info.trial_active ? "Trial Active" : "Free";
     accTrialStatus.textContent = info.trial_active ? "Active" : "Expired";
@@ -144,15 +136,12 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     if (info.subscribed) {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
-      manageBillingBtn.classList.remove("hidden");
     } else if (info.trial_active) {
       upgradeBanner.classList.remove("hidden");
       trialExpiredBox.classList.add("hidden");
-      manageBillingBtn.classList.add("hidden");
     } else {
       upgradeBanner.classList.add("hidden");
       trialExpiredBox.classList.remove("hidden");
-      manageBillingBtn.classList.add("hidden");
     }
   }
 
@@ -168,7 +157,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
 
     session = data.session;
     accessToken = session.access_token;
-	userEmail = session.user.email;
+    userEmail = session.user.email;
 
     localStorage.setItem("nani_access_token", accessToken);
     localStorage.setItem("nani_user_email", userEmail);
@@ -177,17 +166,12 @@ Ask me about lifestyle, diet, or wellness tips to get started.
       const res = await fetch("https://naturopathy.onrender.com/auth/status", {
         headers: { "X-API-KEY": API_SECRET, "Authorization": `Bearer ${accessToken}` }
       });
-
       if (!res.ok) throw new Error("auth/status failed");
-
       const info = await res.json();
-	  accEmail.textContent = userEmail;
-      
       setRoleBadge(info.role);
       updateSubscriptionUI(info);
       showScreen(true);
       showInitialMessage();
-
     } catch (err) {
       console.error("Bootstrap failed", err);
       showScreen(true);
@@ -195,23 +179,24 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     }
   }
 
-// -----------------------------------------------
-// ✅ AUTH INIT 
-// -----------------------------------------------
+  // -----------------------------------------------
+  // AUTH INIT
+  // -----------------------------------------------
   async function initAuth() {
-	const { data } = await sb.auth.getSession();
+    const { data } = await sb.auth.getSession();
     if (data.session) {
       session = data.session;
       accessToken = session.access_token;
+      userEmail = session.user.email;
       showScreen(true);
       showInitialMessage();
     }
 
     sb.auth.onAuthStateChange(async (event, newSession) => {
-      console.log("Auth event:", event);
       if (newSession) {
         session = newSession;
         accessToken = newSession.access_token;
+        userEmail = newSession.user.email;
         await bootstrapUser();
       } else {
         showScreen(false);
@@ -220,7 +205,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   }
 
   initAuth();
-  
+
   // -----------------------------------------------
   // AUTH HANDLERS
   // -----------------------------------------------
@@ -245,20 +230,27 @@ Ask me about lifestyle, diet, or wellness tips to get started.
       options: { redirectTo: window.location.origin }
     });
   };
+
   // -----------------------------------------------
   // ACCOUNT PANEL
   // -----------------------------------------------
   accountBtn.onclick = () => accountPanel.classList.remove("hidden");
   accCloseBtn.onclick = () => accountPanel.classList.add("hidden");
-  
+  accLogoutBtn.onclick = async () => {
+    await sb.auth.signOut();
+    localStorage.clear();
+    conversationHistory = [];
+    showScreen(false);
+    accountPanel.classList.add("hidden");
+  };
+
   // -----------------------------------------------
-  //  SUBSCRIPTION MODAL/UPGRADE FLOW
+  // SUBSCRIPTION MODAL
   // -----------------------------------------------
   function openSubscribeModal() { subscribeModal.classList.remove("hidden"); }
   function closeSubscribeModal() { subscribeModal.classList.add("hidden"); }
 
   subCancelBtn.onclick = closeSubscribeModal;
-  accUpgradeOpen?.addEventListener("click", openSubscribeModal);
   upgradeLink?.addEventListener("click", openSubscribeModal);
   trialSubscribeBtn?.addEventListener("click", openSubscribeModal);
 
@@ -277,17 +269,6 @@ Ask me about lifestyle, diet, or wellness tips to get started.
 
   subMonthlyBtn.onclick = () => { closeSubscribeModal(); startCheckout(STRIPE_MONTHLY_PRICE_ID); };
   subAnnualBtn.onclick  = () => { closeSubscribeModal(); startCheckout(STRIPE_ANNUAL_PRICE_ID); };
-
-  // -----------------------------------------------
-  // LOGOUT
-  // -----------------------------------------------
-  accLogoutBtn.addEventListener("click", async () => {
-    await sb.auth.signOut();
-    localStorage.clear();
-    conversationHistory = [];
-    showScreen(false);
-    accountPanel.classList.add("hidden");
-  });
 
   // -----------------------------------------------
   // CHAT
@@ -326,8 +307,13 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     }
   }
 
-  sendBtn.onclick = sendToNani;
-  inputField.onkeypress = e => e.key === "Enter" && sendToNani();
+  // Connect input + Send button
+  sendBtn.addEventListener("click", sendToNani);
+  inputField.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevent newline
+      sendToNani();
+    }
+  });
+
 });
-
-
