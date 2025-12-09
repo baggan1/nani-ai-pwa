@@ -227,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
      last_sign_in_at: session.user.last_sign_in_at,
      expires_at: session.expires_at,
     });
+	console.log("Supabase URL:", SUPABASE_URL);
   });
 
   // -----------------------------------------------
