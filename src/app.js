@@ -274,38 +274,61 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   // CHAT
   // -----------------------------------------------
   async function sendToNani() {
-    const query = inputField.value.trim();
-    if (!query) return;
+  const query = inputField.value.trim();
+  if (!query) return;
 
-    appendMessage("user", query);
-    addToHistory("user", query);
-    inputField.value = "";
-    showTyping();
+  appendMessage("user", query);
+  addToHistory("user", query);
+  inputField.value = "";
+  showTyping();
 
-    try {
-      const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-          "X-API-KEY": API_SECRET
-        },
-        body: JSON.stringify({
-          query,
-          history: conversationHistory,
-          match_threshold: 0.4,
-          match_count: 3
-        })
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch("https://naturopathy.onrender.com/fetch_naturopathy_results", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+        "X-API-KEY": API_SECRET
+      },
+      body: JSON.stringify({
+        query,
+        history: conversationHistory,
+        match_threshold: 0.4,
+        match_count: 3
+      })
+    });
+
+    // Log the raw response for debugging
+    const text = await res.text();
+    if (!res.ok) {
+      console.error("API Error:", res.status, text);
       hideTyping();
-      appendMessage("nani", data.summary || "⚠️ Error");
-      addToHistory("assistant", data.summary || "");
-    } catch {
-      hideTyping();
-      appendMessage("nani", "⚠️ Network error");
+      appendMessage("nani", `⚠️ API Error: ${res.status}`);
+      return;
     }
+
+    // Parse JSON safely
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e, text);
+      hideTyping();
+      appendMessage("nani", "⚠️ Response parsing error");
+      return;
+    }
+
+    hideTyping();
+    appendMessage("nani", data.summary || "⚠️ No response from Nani");
+    addToHistory("assistant", data.summary || "");
+
+  } catch (err) {
+    console.error("Network or fetch error:", err);
+    hideTyping();
+    appendMessage("nani", "⚠️ Network error");
   }
+}
+
 
   // Connect input + Send button
   sendBtn.addEventListener("click", sendToNani);
