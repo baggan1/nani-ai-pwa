@@ -13,10 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-  console.log("Supabase URL:", SUPABASE_URL);
-  console.log("Supabase Key present:", !!SUPABASE_KEY);
-  console.log("API_SECRET present:", !!API_SECRET);
-
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error("Supabase environment variables are missing!");
     return;
@@ -40,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const googleBtn        = document.getElementById("google-btn");
 
   const chatBox          = document.getElementById("nani-chat-box");
-  const inputField       = document.getElementById("nani-input");
+  const inputField		 = document.getElementById("nani-input");
   const sendBtn          = document.getElementById("nani-send-btn");
 
   const accountBtn       = document.getElementById("account-btn");
@@ -52,8 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const accSubStatus     = document.getElementById("acc-sub-status");
   const accRoleBadge     = document.getElementById("acc-role-badge");
 
-  const accUpgradeBlock  = document.getElementById("acc-upgrade-block");
-  const accUpgradeOpen   = document.getElementById("acc-upgrade-open");
+  const accUpgradeBlock  = document.getElementById("acc-upgrade-block"); //not being used
+  const accUpgradeOpen   = document.getElementById("acc-upgrade-open");   //not being used
 
   const manageBillingBtn = document.getElementById("manage-billing-btn");
   const accLogoutBtn     = document.getElementById("acc-logout-btn");
@@ -77,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let accessToken = null;
   let userEmail = null;
   let typingBubble = null;
+  let hasShownWelcome = false;
   let conversationHistory = [];
 
   // -----------------------------------------------
@@ -131,8 +128,6 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   // -----------------------------------------------
   // ACCOUNT BADGES
   // -----------------------------------------------
-  // ACCOUNT BADGES
-  // -----------------------------------------------
   function setRoleBadge(role) {
     accRoleBadge.className = "role-badge";
     accRoleBadge.textContent = role === "premium" ? "Premium" :
@@ -173,7 +168,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
 
     session = data.session;
     accessToken = session.access_token;
-    userEmail = session.user.email;
+	userEmail = session.user.email;
 
     localStorage.setItem("nani_access_token", accessToken);
     localStorage.setItem("nani_user_email", userEmail);
@@ -186,11 +181,11 @@ Ask me about lifestyle, diet, or wellness tips to get started.
       if (!res.ok) throw new Error("auth/status failed");
 
       const info = await res.json();
-      accEmail.textContent = userEmail;
+	  accEmail.textContent = userEmail;
+      
       setRoleBadge(info.role);
       updateSubscriptionUI(info);
       showScreen(true);
-
       showInitialMessage();
 
     } catch (err) {
@@ -201,28 +196,27 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   }
 
 // -----------------------------------------------
-// ✅ AUTH INIT (FIXES BLANK SCREEN ISSUE)
+// ✅ AUTH INIT 
 // -----------------------------------------------
   async function initAuth() {
-	// 1️⃣ Handle restored sessions (Google redirect / refresh)
 	const { data } = await sb.auth.getSession();
+    if (data.session) {
+      session = data.session;
+      accessToken = session.access_token;
+      showScreen(true);
+      showInitialMessage();
+    }
 
-	if (data.session) {
-		await bootstrapUser();
-	} else {
-		showScreen(false);
-	}
-
-	// 2️⃣ Listen for future auth changes
-	sb.auth.onAuthStateChange(async (event, newSession) => {
-		console.log("Supabase Auth Event:", event);
-
-		if (newSession) {
-		await bootstrapUser();
-		} else {
-		showScreen(false);
-		}
-	});
+    sb.auth.onAuthStateChange(async (event, newSession) => {
+      console.log("Auth event:", event);
+      if (newSession) {
+        session = newSession;
+        accessToken = newSession.access_token;
+        await bootstrapUser();
+      } else {
+        showScreen(false);
+      }
+    });
   }
 
   initAuth();
@@ -233,11 +227,16 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   sendMagicBtn.onclick = async () => {
     const email = magicEmailInput.value.trim();
     if (!email.includes("@")) return alert("Enter valid email");
-    await sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin }
-    });
-    alert("Magic link sent");
+    try {
+      await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      });
+      alert("Magic link sent");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send magic link");
+    }
   };
 
   googleBtn.onclick = () => {
@@ -246,18 +245,14 @@ Ask me about lifestyle, diet, or wellness tips to get started.
       options: { redirectTo: window.location.origin }
     });
   };
-
-  accLogoutBtn.onclick = async () => {
-    await sb.auth.signOut();
-  };
   // -----------------------------------------------
   // ACCOUNT PANEL
   // -----------------------------------------------
-  accountBtn.addEventListener("click", () => accountPanel.classList.remove("hidden"));
-  accCloseBtn.addEventListener("click", () => accountPanel.classList.add("hidden"));
-
+  accountBtn.onclick = () => accountPanel.classList.remove("hidden");
+  accCloseBtn.onclick = () => accountPanel.classList.add("hidden");
+  
   // -----------------------------------------------
-  // UPGRADE FLOW
+  //  SUBSCRIPTION MODAL/UPGRADE FLOW
   // -----------------------------------------------
   function openSubscribeModal() { subscribeModal.classList.remove("hidden"); }
   function closeSubscribeModal() { subscribeModal.classList.add("hidden"); }
@@ -333,5 +328,6 @@ Ask me about lifestyle, diet, or wellness tips to get started.
 
   sendBtn.onclick = sendToNani;
   inputField.onkeypress = e => e.key === "Enter" && sendToNani();
-
 });
+
+
