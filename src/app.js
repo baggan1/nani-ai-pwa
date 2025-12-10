@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let userEmail = null;
   let typingBubble = null;
   let hasShownWelcome = false;
+  let cachedAccountInfo = null;
   let conversationHistory = [];
 
   // -----------------------------------------------
@@ -143,6 +144,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   }
   
   function updateSubscriptionUI(info) {
+	document.getElementById("acc-loading")?.classList.add("hidden");  
     accEmail.textContent       = userEmail;
     accSubStatus.textContent   = info.subscribed ? "Premium Active" :
                                 info.trial_active ? "Trial Active" : "Free";
@@ -169,36 +171,56 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   // -----------------------------------------------
   // 🔐 BOOTSTRAP USER
   // -----------------------------------------------
-  async function bootstrapUser() {
-    const { data } = await sb.auth.getSession();
-    if (!data.session) {
-      showScreen(false);
-      return;
-    }
+ async function bootstrapUser() {
+  const { data } = await sb.auth.getSession();
 
-    session = data.session;
-    accessToken = session.access_token;
-    userEmail = session.user.email;
-
-    localStorage.setItem("nani_access_token", accessToken);
-    localStorage.setItem("nani_user_email", userEmail);
-
-    try {
-      const res = await fetch("https://naturopathy.onrender.com/auth/status", {
-        headers: { "X-API-KEY": API_SECRET, "Authorization": `Bearer ${accessToken}` }
-      });
-      if (!res.ok) throw new Error("auth/status failed");
-      const info = await res.json();
-      setRoleBadge(info.role);
-      updateSubscriptionUI(info);
-      showScreen(true);
-      showInitialMessage();
-    } catch (err) {
-      console.error("Bootstrap failed", err);
-      showScreen(true);
-      showInitialMessage();
-    }
+  if (!data.session) {
+    showScreen(false);
+    return;
   }
+
+  session = data.session;
+  accessToken = session.access_token;
+  userEmail = session.user.email;
+
+  localStorage.setItem("nani_access_token", accessToken);
+  localStorage.setItem("nani_user_email", userEmail);
+
+  // ✅ Show app immediately (no waiting)
+  showScreen(true);
+  showInitialMessage();
+
+  // ✅ If we already have cached data, use it instantly
+  if (cachedAccountInfo) {
+    setRoleBadge(cachedAccountInfo.role);
+    updateSubscriptionUI(cachedAccountInfo);
+    return;
+  }
+
+  // ✅ Fetch account status in background
+  try {
+    const res = await fetch("https://naturopathy.onrender.com/auth/status", {
+      headers: {
+        "X-API-KEY": API_SECRET,
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    if (!res.ok) throw new Error("auth/status failed");
+
+    const info = await res.json();
+
+    cachedAccountInfo = info; // ✅ cache it
+
+    setRoleBadge(info.role);
+    updateSubscriptionUI(info);
+
+  } catch (err) {
+    console.error("Bootstrap failed", err);
+    // Graceful fallback — user still gets chat
+  }
+ }
+
 
   // -----------------------------------------------
   // AUTH INIT
