@@ -59,10 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const subMonthlyBtn    = document.getElementById("sub-monthly");
   const subAnnualBtn     = document.getElementById("sub-annual");
   const subCancelBtn     = document.getElementById("sub-cancel");
-
+  
   const accUpgradeBlock   = document.getElementById("acc-upgrade-block");
-  const accUpgradeMonthly = document.getElementById("acc-upgrade-monthly");
-  const accUpgradeAnnual  = document.getElementById("acc-upgrade-annual");
+  const accUpgradeOpen    = document.getElementById("acc-upgrade-open");
+  const manageBillingBtn  = document.getElementById("manage-billing-btn");
 
   // -----------------------------------------------
   // STATE
@@ -152,15 +152,15 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     accDaysLeft.textContent    = info.days_left ?? "—";
 
     if (info.subscribed) {
-      upgradeBanner.classList.add("hidden");
+      accUpgradeBlock.classList.add("hidden");
       trialExpiredBox.classList.add("hidden");
 	  manageBillingBtn.classList.remove("hidden");
     } else if (info.trial_active) {
-      upgradeBanner.classList.remove("hidden");
+      accUpgradeBlock.classList.remove("hidden");
       trialExpiredBox.classList.add("hidden");
 	  manageBillingBtn.classList.add("hidden");
     } else {
-      upgradeBanner.classList.add("hidden");
+      accUpgradeBlock.classList.remove("hidden");
       trialExpiredBox.classList.remove("hidden");
 	  manageBillingBtn.classList.add("hidden");
     }
@@ -279,6 +279,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   // -----------------------------------------------
   accountBtn.onclick = () => accountPanel.classList.remove("hidden");
   accCloseBtn.onclick = () => accountPanel.classList.add("hidden");
+  
   accLogoutBtn.onclick = async () => {
     await sb.auth.signOut();
     localStorage.clear();
@@ -286,15 +287,7 @@ Ask me about lifestyle, diet, or wellness tips to get started.
     showScreen(false);
     accountPanel.classList.add("hidden");
   };
-  accUpgradeMonthly?.addEventListener("click", () => {
-    if (!session || !session.user) return alert("Please log in to subscribe");
-    startCheckout(STRIPE_MONTHLY_PRICE_ID);
-  });
-
-  accUpgradeAnnual?.addEventListener("click", () => {
-    if (!session || !session.user) return alert("Please log in to subscribe");
-    startCheckout(STRIPE_ANNUAL_PRICE_ID);
-  });
+  // ✅ Open subscription modal from Account panel
   accUpgradeOpen?.addEventListener("click", () => {
     subscribeModal.classList.remove("hidden");
   });
