@@ -431,3 +431,24 @@ button {
   .typing-dots div { background: #9cebbf; }
   
 }
+/* ---------- MAINTENANCE PAGE ---------- */
+.maintenance {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f7faf9;
+  text-align: center;
+  padding: 2rem;
+}
+
+.maintenance h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.maintenance p {
+  font-size: 1.1rem;
+  color: #555;
+}

@@ -1,3 +1,20 @@
+// -----------------------------------------------
+// MAINTENANCE MODE
+// -----------------------------------------------
+const MAINTENANCE_MODE = true;
+
+if (MAINTENANCE_MODE) {
+  document.body.innerHTML = `
+    <div class="maintenance">
+      <h1>🛠 Updates in Progress</h1>
+      <p>Nani AI is being upgraded.</p>
+      <p>Please visit again soon 🌱</p>
+    </div>
+  `;
+  throw new Error("Maintenance mode");
+}
+
+
 /***************************************************
  * NANI-AI PWA (Supabase Auth + Automatic Trial)
  * Conversational Version — Sends Short History
