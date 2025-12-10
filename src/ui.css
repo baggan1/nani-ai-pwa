@@ -431,24 +431,60 @@ button {
   .typing-dots div { background: #9cebbf; }
   
 }
-/* ---------- MAINTENANCE PAGE ---------- */
+/* ------------------------------------------
+   Maintenance Mode – Light + Dark
+------------------------------------------- */
+
 .maintenance {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #f7faf9;
-  text-align: center;
+  max-width: 420px;
   padding: 2rem;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .maintenance h1 {
-  font-size: 2rem;
+  font-size: 1.9rem;
   margin-bottom: 1rem;
+  color: #1f2937;
 }
 
 .maintenance p {
-  font-size: 1.1rem;
-  color: #555;
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+/* Page backdrop */
+body:has(.maintenance) {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f7faf9;
+}
+
+/* ------------------------------------------
+   Dark Mode Support
+------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  body:has(.maintenance) {
+    background: #0f172a;
+  }
+
+  .maintenance {
+    background: #020617;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .maintenance h1 {
+    color: #e5e7eb;
+  }
+
+  .maintenance p {
+    color: #9ca3af;
+  }
 }
