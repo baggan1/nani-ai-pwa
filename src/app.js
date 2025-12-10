@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const accountPanel     = document.getElementById("account-panel");
   const accCloseBtn      = document.getElementById("acc-close");
   const accLogoutBtn     = document.getElementById("acc-logout-btn");
+  const manageBillingBtn  = document.getElementById("manage-billing-btn");
 
   const accEmail         = document.getElementById("acc-email");
   const accTrialStatus   = document.getElementById("acc-trial-status");
@@ -62,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const accUpgradeBlock   = document.getElementById("acc-upgrade-block");
   const accUpgradeOpen    = document.getElementById("acc-upgrade-open");
-  const manageBillingBtn  = document.getElementById("manage-billing-btn");
+
 
   // -----------------------------------------------
   // STATE
@@ -291,6 +292,42 @@ Ask me about lifestyle, diet, or wellness tips to get started.
   accUpgradeOpen?.addEventListener("click", () => {
     subscribeModal.classList.remove("hidden");
   });
+  
+  manageBillingBtn?.addEventListener("click", async () => {
+	if (!session || !session.user) {
+		alert("Please log in again.");
+		return;
+	}
+
+	try {
+		const res = await fetch(
+		"https://naturopathy.onrender.com/create_customer_portal",
+		{
+        method: "POST",
+			headers: {
+			"Content-Type": "application/json",
+			"X-API-KEY": API_SECRET,
+			},
+			body: JSON.stringify({
+			user_id: session.user.id
+			})
+		}
+	 );
+
+    if (!res.ok) throw new Error("Portal request failed");
+
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url; // ✅ redirect to Stripe
+    } else {
+      alert("Failed to open billing portal.");
+    }
+  } catch (err) {
+    console.error("Manage billing error:", err);
+    alert("Unable to open billing portal. Try again.");
+  }
+});
+
 
   // -----------------------------------------------
   // SUBSCRIPTION MODAL
